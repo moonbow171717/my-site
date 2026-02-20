@@ -51,6 +51,7 @@ body {
   color: #ccc;
   font-size: 20px;
   cursor: pointer;
+  padding: 5px;
 }
 
 /* ===== 레이아웃 ===== */
@@ -73,7 +74,7 @@ body {
   text-decoration: none;
   color: #8b90a0;
   font-size: 14px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   transition: 0.2s;
 }
 
@@ -206,7 +207,6 @@ body {
 }
 
 /* ===== Pinterest Photo Grid ===== */
-
 .photo-grid {
   column-count: 4;
   column-gap: 16px;
@@ -235,7 +235,7 @@ body {
   opacity: 0.9;
 }
 
-/* ===== 반응형 ===== */
+/* ===== 반응형 (모바일 최적화 수정본) ===== */
 
 @media (max-width: 1200px) {
   .photo-grid { column-count: 3; }
@@ -248,31 +248,52 @@ body {
 @media (max-width: 768px) {
   .layout {
     flex-direction: column;
-    gap: 20px;
+    gap: 10px;
+    margin: 20px auto;
   }
 
+  /* 사이드바 기본 숨김 */
   .sidebar {
     display: none;
     width: 100%;
+    box-sizing: border-box;
   }
 
+  /* 메뉴 활성화 상태 */
   .sidebar.open {
     display: block;
-    background: #14171d;
-    padding: 14px;
-    border-radius: 10px;
+    background: #171a21;
+    padding: 15px;
+    border-radius: 12px;
     border: 1px solid #1f232c;
+    margin-bottom: 20px;
+    animation: slideDown 0.3s ease-out;
+  }
+
+  .sidebar a {
+    padding: 10px 5px;
+    border-bottom: 1px solid #1f232c;
+    margin-bottom: 0;
+  }
+
+  .sidebar a:last-child {
+    border-bottom: none;
   }
 
   .menu-btn {
-    display: block;
+    display: block; /* 모바일에서 햄버거 버튼 보임 */
   }
 
   .top-links {
-    display: none;
+    display: none; /* 상단 텍스트 메뉴 숨김 */
   }
 }
 
 @media (max-width: 500px) {
   .photo-grid { column-count: 1; }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
