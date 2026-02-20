@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>My Archive</title>
   <link rel="stylesheet" href="style.css"/>
+
+  <!-- 🔐 로그인 체크 -->
   <script>
     if (!sessionStorage.getItem("auth")) {
       location.href = "login.html";
@@ -16,11 +18,13 @@
 <nav class="topbar">
   <div class="top-inner">
     <div class="logo">📦 My Archive</div>
+
     <div class="top-links">
       <a href="index.html">Home</a>
       <a href="index.html?cat=diary">Diary</a>
       <a href="index.html?cat=photos">Photos</a>
     </div>
+
     <button class="menu-btn" id="menuBtn">☰</button>
   </div>
 </nav>
@@ -29,90 +33,12 @@
   <aside class="sidebar" id="sidebar">
     <div id="sub-menu"></div>
   </aside>
+
   <main class="content">
     <div id="post-list"></div>
   </main>
 </div>
 
-<script>
-  document.getElementById("menuBtn").onclick = () => {
-    document.getElementById("sidebar").classList.toggle("open");
-  };
-
-  document.addEventListener("DOMContentLoaded", () => {
-    const list = document.getElementById("post-list");
-    const subMenu = document.getElementById("sub-menu");
-    const params = new URLSearchParams(location.search);
-    const category = params.get("cat");
-    const sub = params.get("sub");
-
-    fetch("posts/index.json?v=" + new Date().getTime())
-      .then(r => {
-        if (!r.ok) throw new Error("파일을 찾을 수 없습니다.");
-        return r.json();
-      })
-      .then(originalPosts => {
-        let posts = originalPosts.filter(p => p && p.title && p.date);
-        
-        if (category) posts = posts.filter(p => p.category === category);
-        
-        if (category === "diary") {
-          const subs = [...new Set(posts.filter(p => p.sub).map(p => p.sub))];
-          if (subs.length) {
-            subMenu.innerHTML = `<a href="index.html?cat=diary"${!sub ? ' class="active"' : ''}>전체</a>` +
-              subs.map(s => `<a href="index.html?cat=diary&sub=${encodeURIComponent(s)}"${sub === s ? ' class="active"' : ''}>${s}</a>`).join("");
-          }
-        }
-
-        if (sub) posts = posts.filter(p => p.sub === sub);
-        
-        posts.sort((a, b) => new Date(b.date) - new Date(a.date));
-        
-        list.innerHTML = "";
-
-        posts.forEach(p => {
-          const item = document.createElement("div");
-          item.className = "post-item";
-
-          // ✅ 사진첩(photos) 카테고리이면서 이미지가 있는 경우 썸네일 표시
-          if (p.category === "photos" && p.images && p.images.length > 0) {
-            item.style.display = "flex";
-            item.style.alignItems = "center";
-            item.innerHTML = `
-              <div style="margin-right: 15px;">
-                <img src="${p.images[0]}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">
-              </div>
-              <div style="flex: 1;">
-                <h3>${p.title}</h3>
-                <span class="date">${p.date}</span>
-              </div>
-            `;
-          } else {
-            // 일반 다이어리 글 로직
-            item.innerHTML = `<h3>${p.title}</h3><span class="date">${p.date}</span><p>${p.excerpt || "내용 보기"}</p>`;
-          }
-
-          item.onclick = () => {
-            // from 값을 카테고리에 맞게 설정
-            let from = category === "diary" ? (sub ? `diary-${sub}` : "diary-all") : (category || "home");
-            
-            let fileName = p.file || p.date;
-
-            if (!fileName.toString().endsWith('.json')) {
-              fileName += '.json';
-            }
-
-            const finalUrl = `viewer.html?post=posts/${fileName}&from=${encodeURIComponent(from)}`;
-            location.href = finalUrl;
-          };
-          list.appendChild(item);
-        });
-      })
-      .catch(err => {
-        console.error("오류 발생:", err);
-        list.innerHTML = "<p style='padding:20px;'>목록을 불러오는 중 오류가 발생했습니다.</p>";
-      });
-  });
-</script>
+<script src="script.js"></script>
 </body>
 </html>
