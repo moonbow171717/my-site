@@ -1,5 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+  // 🔐 로그인 체크 (HTML 말고 JS에서만)
+  if (!sessionStorage.getItem("auth")) {
+    location.href = "login.html";
+    return;
+  }
+
   const q = new URLSearchParams(location.search);
   const postUrl = q.get("post");
   const img = q.get("img");
@@ -59,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .then(p => {
 
-      const images = p.images
+      const images = Array.isArray(p.images)
         ? p.images.map(i => `
           <div class="img-wrap">
             <img src="${i}" class="zoomable">
@@ -113,10 +119,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const modal = document.getElementById("imgModal");
         const modalImg = document.getElementById("modalImg");
 
-        document.querySelectorAll(".zoomable").forEach(img => {
-          img.onclick = () => {
+        document.querySelectorAll(".zoomable").forEach(imgEl => {
+          imgEl.onclick = () => {
             modal.style.display = "flex";
-            modalImg.src = img.src;
+            modalImg.src = imgEl.src;
           };
         });
 
