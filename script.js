@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
     .then(r => r.json())
     .then(originalPosts => {
 
-      // 🔒 안전 필터
+      // 🔒 안전 필터 (데이터가 올바른지 확인)
       const validPosts = originalPosts.filter(
         p => p && p.title && p.date
       );
@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (category) posts = posts.filter(p => p.category === category);
 
       // =========================
-      // 서브메뉴
+      // 서브메뉴 (카테고리 필터)
       // =========================
       if (category === "diary") {
         const subs = [...new Set(
@@ -70,6 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (sub) posts = posts.filter(p => p.sub === sub);
 
+      // 날짜 순 정렬 (최신순)
       posts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
       list.innerHTML = "";
@@ -83,16 +84,22 @@ document.addEventListener("DOMContentLoaded", () => {
           <p>${p.excerpt || "내용 보기"}</p>
         `;
 
-        // ✅ 여기 핵심 수정
+        // ✅ 수정된 핵심 부분
+        // p.date 대신 p.filename(혹은 실제 파일명)을 사용하도록 유연하게 변경
         item.onclick = () => {
           let from = "home";
-
           if (category === "diary") {
             from = sub ? `diary-${sub}` : "diary-all";
           }
 
+          // 파일 이름에 .json이 안 붙어있을 경우를 대비해 처리
+          let targetFile = p.filename || p.date;
+          if (!targetFile.endsWith('.json')) {
+            targetFile += '.json';
+          }
+
           location.href =
-            `viewer.html?post=posts/${p.date}.json&from=${encodeURIComponent(from)}`;
+            `viewer.html?post=posts/${targetFile}&from=${encodeURIComponent(from)}`;
         };
 
         list.appendChild(item);
