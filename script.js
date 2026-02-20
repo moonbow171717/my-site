@@ -25,7 +25,8 @@ document.addEventListener("DOMContentLoaded", () => {
           item.className = "photo-card";
           item.innerHTML = `<img src="${img.src}">`;
           item.onclick = () =>
-            location.href = `viewer.html?img=${encodeURIComponent(img.src)}&from=photos`;
+            location.href =
+              `viewer.html?img=${encodeURIComponent(img.src)}&from=photos`;
           list.appendChild(item);
         };
       });
@@ -40,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
     .then(r => r.json())
     .then(originalPosts => {
 
-      // 🔒 undefined 제거
+      // 🔒 안전 필터
       const validPosts = originalPosts.filter(
         p => p && p.title && p.date
       );
@@ -48,7 +49,9 @@ document.addEventListener("DOMContentLoaded", () => {
       let posts = [...validPosts];
       if (category) posts = posts.filter(p => p.category === category);
 
+      // =========================
       // 서브메뉴
+      // =========================
       if (category === "diary") {
         const subs = [...new Set(
           validPosts.filter(p => p.sub).map(p => p.sub)
@@ -66,6 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       if (sub) posts = posts.filter(p => p.sub === sub);
+
       posts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
       list.innerHTML = "";
@@ -78,8 +82,19 @@ document.addEventListener("DOMContentLoaded", () => {
           <span class="date">${p.date}</span>
           <p>${p.excerpt || "내용 보기"}</p>
         `;
-        item.onclick = () =>
-          location.href = `viewer.html?post=posts/${p.date}.json&from=home`;
+
+        // ✅ 여기 핵심 수정
+        item.onclick = () => {
+          let from = "home";
+
+          if (category === "diary") {
+            from = sub ? `diary-${sub}` : "diary-all";
+          }
+
+          location.href =
+            `viewer.html?post=posts/${p.date}.json&from=${encodeURIComponent(from)}`;
+        };
+
         list.appendChild(item);
       });
     })
