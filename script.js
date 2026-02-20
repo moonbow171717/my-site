@@ -15,7 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
     list.innerHTML = "";
 
     const formats = ["jpg","jpeg","png","webp","gif"];
-
     for (let i = 1; i <= 300; i++) {
       formats.forEach(ext => {
         const img = new Image();
@@ -34,24 +33,21 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================
-  // 📝 Posts
+  // 📝 Posts (ID 기반)
   // =========================
   fetch("posts/index.json")
     .then(r => r.json())
     .then(originalPosts => {
 
-      // 🔒 undefined 제거
-      const validPosts = originalPosts.filter(
-        p => p && p.title && p.date
-      );
+      let posts = originalPosts.filter(p => p && p.id);
 
-      let posts = [...validPosts];
       if (category) posts = posts.filter(p => p.category === category);
+      if (sub) posts = posts.filter(p => p.sub === sub);
 
       // 서브메뉴
       if (category === "diary") {
         const subs = [...new Set(
-          validPosts.filter(p => p.sub).map(p => p.sub)
+          originalPosts.filter(p => p.sub).map(p => p.sub)
         )];
 
         if (subs.length) {
@@ -65,9 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      if (sub) posts = posts.filter(p => p.sub === sub);
       posts.sort((a, b) => new Date(b.date) - new Date(a.date));
-
       list.innerHTML = "";
 
       posts.forEach(p => {
@@ -79,7 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <p>${p.excerpt || "내용 보기"}</p>
         `;
         item.onclick = () =>
-          location.href = `viewer.html?post=posts/${p.date}.json&from=home`;
+          location.href = `viewer.html?post=posts/${p.id}.json&from=home`;
         list.appendChild(item);
       });
     })
