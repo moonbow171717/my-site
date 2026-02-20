@@ -46,7 +46,7 @@
             const category = params.get('cat');
             const sub = params.get('sub');
 
-            // 캐시 방지를 위해 v=Date.now()를 추가했습니다.
+            // 뒤에 ?v=... 를 붙여서 서버가 새 목록을 억지로 가져오게만 했습니다.
             fetch('posts/index.json?v=' + Date.now())
                 .then(res => res.json())
                 .then(posts => {
@@ -76,16 +76,12 @@
                             <div class="date">${p.date}</div>
                             <p>${p.excerpt || '내용 보기...'}</p>
                         `;
+                        
+                        // ⭐ 사용자님이 처음에 쓰시던 그 방식 그대로입니다. 
+                        // index.json의 file 항목에 적힌 글자 그대로 연결합니다.
                         item.onclick = () => {
                             const from = category === 'diary' ? (sub ? `diary-${sub}` : 'diary-all') : 'home';
-                            
-                            // 파일명 처리를 가장 유연하게 수정했습니다.
-                            let fileName = p.file;
-                            if (!fileName.includes('.')) {
-                                fileName += '.json';
-                            }
-                            
-                            location.href = `viewer.html?post=posts/${fileName}&from=${from}`;
+                            location.href = `viewer.html?post=posts/${p.file}&from=${from}`;
                         };
                         list.appendChild(item);
                     });
