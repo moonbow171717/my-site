@@ -33,35 +33,48 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================
-  // 📝 Posts (ID 기반)
+  // 📝 Posts
   // =========================
   fetch("posts/index.json")
     .then(r => r.json())
     .then(originalPosts => {
 
-      let posts = originalPosts.filter(p => p && p.id);
+      if (!Array.isArray(originalPosts) || originalPosts.length === 0) {
+        list.innerHTML = "글이 없습니다.";
+        return;
+      }
 
-      if (category) posts = posts.filter(p => p.category === category);
-      if (sub) posts = posts.filter(p => p.sub === sub);
+      let posts = [...originalPosts];
+
+      if (category) {
+        posts = posts.filter(p => p.category === category);
+      }
 
       // 서브메뉴
       if (category === "diary") {
         const subs = [...new Set(
-          originalPosts.filter(p => p.sub).map(p => p.sub)
+          originalPosts
+            .filter(p => p.category === "diary" && p.sub)
+            .map(p => p.sub)
         )];
 
         if (subs.length) {
-          subMenu.innerHTML =
-            `<a href="index.html?cat=diary"${!sub ? ' class="active"' : ''}>전체</a>` +
-            subs.map(s =>
-              `<a href="index.html?cat=diary&sub=${encodeURIComponent(s)}"${
-                sub === s ? ' class="active"' : ''
-              }>${s}</a>`
-            ).join("");
+          let html = `<a href="index.html?cat=diary"${!sub ? ' class="active"' : ''}>전체</a>`;
+          subs.forEach(s => {
+            html += `<a href="index.html?cat=diary&sub=${encodeURIComponent(s)}"${
+              sub === s ? ' class="active"' : ''
+            }>${s}</a>`;
+          });
+          subMenu.innerHTML = html;
         }
       }
 
+      if (sub) {
+        posts = posts.filter(p => p.sub === sub);
+      }
+
       posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+
       list.innerHTML = "";
 
       posts.forEach(p => {
@@ -72,8 +85,9 @@ document.addEventListener("DOMContentLoaded", () => {
           <span class="date">${p.date}</span>
           <p>${p.excerpt || "내용 보기"}</p>
         `;
-        item.onclick = () =>
+        item.onclick = () => {
           location.href = `viewer.html?post=posts/${p.id}.json&from=home`;
+        };
         list.appendChild(item);
       });
     })
