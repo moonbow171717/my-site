@@ -11,10 +11,10 @@ body {
 .topbar {
   position: sticky;
   top: 0;
-  background: rgba(15,17,21,0.75);
+  background: rgba(15, 17, 21, 0.9); /* 모바일 가독성을 위해 불투명도 조절 */
   backdrop-filter: blur(16px);
   border-bottom: 1px solid #1f232c;
-  z-index: 100;
+  z-index: 1000; /* 상단바를 최상단으로 */
 }
 
 .top-inner {
@@ -28,7 +28,7 @@ body {
 
 .logo {
   font-weight: 600;
-  font-size: 15px;
+  font-size: 16px; /* 약간 키움 */
   opacity: 0.9;
 }
 
@@ -45,13 +45,15 @@ body {
 }
 
 .menu-btn {
-  display: none;
-  background: none;
-  border: none;
-  color: #ccc;
-  font-size: 20px;
+  display: none; /* 기본 숨김 */
+  background: #1f232c; /* 버튼 배경색 추가 */
+  border: 1px solid #333;
+  color: #fff; /* 버튼 색상 흰색으로 */
+  font-size: 22px; /* 아이콘 크기 키움 */
   cursor: pointer;
-  padding: 5px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  line-height: 1;
 }
 
 /* ===== 레이아웃 ===== */
@@ -160,7 +162,7 @@ body {
 .img-wrap img {
   max-width: 100%;
   border-radius: 14px;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
   cursor: zoom-in;
   transition: 0.25s;
 }
@@ -173,7 +175,7 @@ body {
 .img-modal {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.88);
+  background: rgba(0, 0, 0, 0.88);
   display: none;
   align-items: center;
   justify-content: center;
@@ -185,7 +187,7 @@ body {
   max-width: 90%;
   max-height: 90%;
   border-radius: 14px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
 }
 
 @keyframes fadeIn {
@@ -235,7 +237,7 @@ body {
   opacity: 0.9;
 }
 
-/* ===== 반응형 (모바일 최적화 수정본) ===== */
+/* ===== 반응형 (모바일 최적화 수정완료) ===== */
 
 @media (max-width: 1200px) {
   .photo-grid { column-count: 3; }
@@ -252,28 +254,29 @@ body {
     margin: 20px auto;
   }
 
-  /* 사이드바 기본 숨김 */
+  /* 사이드바 숨김 해제 및 절대 위치 설정 */
   .sidebar {
     display: none;
     width: 100%;
     box-sizing: border-box;
   }
 
-  /* 메뉴 활성화 상태 */
+  /* 메뉴 활성화 상태: 상단바 바로 아래에 배치 */
   .sidebar.open {
-    display: block;
+    display: block !important;
     background: #171a21;
     padding: 15px;
     border-radius: 12px;
-    border: 1px solid #1f232c;
+    border: 1px solid #333;
     margin-bottom: 20px;
     animation: slideDown 0.3s ease-out;
   }
 
   .sidebar a {
-    padding: 10px 5px;
+    padding: 12px 10px; /* 클릭 영역 확대 */
     border-bottom: 1px solid #1f232c;
     margin-bottom: 0;
+    font-size: 15px;
   }
 
   .sidebar a:last-child {
@@ -281,11 +284,11 @@ body {
   }
 
   .menu-btn {
-    display: block; /* 모바일에서 햄버거 버튼 보임 */
+    display: block !important; /* 모바일에서 확실하게 보임 */
   }
 
   .top-links {
-    display: none; /* 상단 텍스트 메뉴 숨김 */
+    display: none !important; /* 모바일에서 텍스트 메뉴 확실히 숨김 */
   }
 }
 
