@@ -1,5 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+  // 🔐 로그인 체크 (여기서만!)
+  if (!sessionStorage.getItem("auth")) {
+    location.href = "login.html";
+    return;
+  }
+
   const list = document.getElementById("post-list");
   const subMenu = document.getElementById("sub-menu");
 
@@ -49,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // 🔒 file 없는 글은 제거 (undefined 방지)
+      // ✅ file 있는 글만 사용 (중요)
       let posts = originalPosts.filter(p => p.file);
 
       if (category) {
@@ -85,7 +91,6 @@ document.addEventListener("DOMContentLoaded", () => {
         posts = posts.filter(p => p.sub === sub);
       }
 
-      // 최신순
       posts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
       list.innerHTML = "";
@@ -99,7 +104,6 @@ document.addEventListener("DOMContentLoaded", () => {
           <p>${p.excerpt || "내용 보기"}</p>
         `;
 
-        // ✅ 여기서 file을 그대로 viewer로 넘김
         item.onclick = () => {
           location.href =
             `viewer.html?post=${encodeURIComponent(p.file)}&from=home`;
