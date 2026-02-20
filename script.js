@@ -1,11 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-  // 🔐 로그인 체크 (HTML 말고 JS에서만)
-  if (!sessionStorage.getItem("auth")) {
-    location.href = "login.html";
-    return;
-  }
-
   const list = document.getElementById("post-list");
   const subMenu = document.getElementById("sub-menu");
 
@@ -35,8 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
           item.innerHTML = `<img src="${img.src}">`;
 
           item.onclick = () => {
-            location.href =
-              `viewer.html?img=${encodeURIComponent(img.src)}&from=photos`;
+            location.href = `viewer.html?img=${encodeURIComponent(img.src)}&from=photos`;
           };
 
           list.appendChild(item);
@@ -47,43 +40,42 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // =========================
-  // 📝 POSTS
+  // 📝 POSTS (Cloudflare 안정판)
   // =========================
 
   fetch("posts/_list.json")
     .then(res => res.json())
     .then(files => {
 
-      if (!Array.isArray(files) || files.length === 0) {
+      const loaders = files.map(f =>
+        fetch(`posts/${f}`)
+          .then(r => r.ok ? r.json() : null)
+          .catch(() => null)
+      );
+
+      return Promise.all(loaders);
+    })
+    .then(all => {
+
+      const originalPosts = all.filter(Boolean);
+
+      if (!originalPosts.length) {
         list.innerHTML = "글이 없습니다.";
-        return [];
+        return;
       }
 
-      return Promise.all(
-        files.map(f =>
-          fetch(`posts/${f}`)
-            .then(r => r.json())
-            .catch(() => null)
-        )
-      );
-    })
-    .then(originalPosts => {
-
-      const validPosts = originalPosts.filter(Boolean);
-      let posts = [...validPosts];
+      let posts = [...originalPosts];
 
       if (category) {
         posts = posts.filter(p => p.category === category);
       }
 
-      // =========================
-      // 📂 DIARY 서브메뉴
-      // =========================
+      // 서브메뉴
       if (category === "diary") {
 
         const subs = [];
 
-        validPosts.forEach(p => {
+        originalPosts.forEach(p => {
           if (p.category === "diary" && p.sub && !subs.includes(p.sub)) {
             subs.push(p.sub);
           }
@@ -91,9 +83,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (subs.length) {
           let html = `<div class="sub-links">`;
-          html += `<a href="index.html?cat=diary"${
-            !sub ? ' class="active"' : ''
-          }>전체</a>`;
+          html += `<a href="index.html?cat=diary"${!sub ? ' class="active"' : ''}>전체</a>`;
 
           subs.forEach(s => {
             html += `<a href="index.html?cat=diary&sub=${encodeURIComponent(s)}"${
@@ -113,11 +103,6 @@ document.addEventListener("DOMContentLoaded", function () {
       posts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
       list.innerHTML = "";
-
-      if (posts.length === 0) {
-        list.innerHTML = "글이 없습니다.";
-        return;
-      }
 
       posts.forEach(post => {
 
@@ -141,10 +126,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         list.appendChild(item);
       });
-
     })
     .catch(() => {
       list.innerHTML = "글을 불러오지 못했습니다.";
     });
-
 });
