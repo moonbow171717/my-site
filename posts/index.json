@@ -35,8 +35,7 @@
     "date": "2026-02-25",
     "file": "2026-02-25",
     "category": "diary",
-    "sub": "일상",
-    "excerpt": "이제 편하다"
+    "sub": "일상"
   },
   {
     "title": "연애 포기 각서 (상)",
@@ -55,7 +54,7 @@
   {
     "title": "홈스윗홈 (상)",
     "date": "2026-02-21",
-    "file": "home-sweet-1",
+    "file": "home-sweet-1.json",
     "category": "diary",
     "sub": "홈스윗홈"
   }
