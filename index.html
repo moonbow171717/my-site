@@ -46,20 +46,16 @@
     const category = params.get("cat");
     const sub = params.get("sub");
 
-    // posts/index.json을 가져옵니다. 캐시 방지를 위해 현재 시간 파라미터를 붙였습니다.
     fetch("posts/index.json?v=" + new Date().getTime())
       .then(r => {
         if (!r.ok) throw new Error("파일을 찾을 수 없습니다.");
         return r.json();
       })
       .then(originalPosts => {
-        // 데이터가 유효한지 필터링
         let posts = originalPosts.filter(p => p && p.title && p.date);
         
-        // 카테고리 필터링
         if (category) posts = posts.filter(p => p.category === category);
         
-        // 서브 메뉴 구성 (diary 카테고리일 때)
         if (category === "diary") {
           const subs = [...new Set(posts.filter(p => p.sub).map(p => p.sub))];
           if (subs.length) {
@@ -68,10 +64,8 @@
           }
         }
 
-        // 서브 카테고리 필터링
         if (sub) posts = posts.filter(p => p.sub === sub);
         
-        // 최신순 정렬
         posts.sort((a, b) => new Date(b.date) - new Date(a.date));
         
         list.innerHTML = "";
@@ -79,17 +73,31 @@
         posts.forEach(p => {
           const item = document.createElement("div");
           item.className = "post-item";
-          item.innerHTML = `<h3>${p.title}</h3><span class="date">${p.date}</span><p>${p.excerpt || "내용 보기"}</p>`;
+
+          // ✅ 사진첩(photos) 카테고리이면서 이미지가 있는 경우 썸네일 표시
+          if (p.category === "photos" && p.images && p.images.length > 0) {
+            item.style.display = "flex";
+            item.style.alignItems = "center";
+            item.innerHTML = `
+              <div style="margin-right: 15px;">
+                <img src="${p.images[0]}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">
+              </div>
+              <div style="flex: 1;">
+                <h3>${p.title}</h3>
+                <span class="date">${p.date}</span>
+              </div>
+            `;
+          } else {
+            // 일반 다이어리 글 로직
+            item.innerHTML = `<h3>${p.title}</h3><span class="date">${p.date}</span><p>${p.excerpt || "내용 보기"}</p>`;
+          }
 
           item.onclick = () => {
-            let from = category === "diary" ? (sub ? `diary-${sub}` : "diary-all") : "home";
+            // from 값을 카테고리에 맞게 설정
+            let from = category === "diary" ? (sub ? `diary-${sub}` : "diary-all") : (category || "home");
             
-            // ✅ 수정한 핵심 부분: 
-            // 1. file 항목이 있으면 쓰고, 없으면 date를 파일명으로 사용합니다.
-            // 2. 제목에 '(하)'가 있어도 강제로 파일명을 바꾸지 않습니다.
             let fileName = p.file || p.date;
 
-            // 확장자 중복 방지
             if (!fileName.toString().endsWith('.json')) {
               fileName += '.json';
             }
@@ -102,7 +110,7 @@
       })
       .catch(err => {
         console.error("오류 발생:", err);
-        list.innerHTML = "<p style='padding:20px;'>목록을 불러오는 중 오류가 발생했습니다. index.json 파일을 확인해 주세요.</p>";
+        list.innerHTML = "<p style='padding:20px;'>목록을 불러오는 중 오류가 발생했습니다.</p>";
       });
   });
 </script>
