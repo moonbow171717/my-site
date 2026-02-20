@@ -1,38 +1,90 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8"/>
-  <title>My Archive v5</title>
-  <link rel="stylesheet" href="style.css"/>
-  <script>
-    if (!sessionStorage.getItem("auth")) { location.href = "login.html"; }
-  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Archive</title>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        // 로그인 체크
+        if (!sessionStorage.getItem('auth')) {
+            location.href = 'login.html';
+        }
+    </script>
 </head>
 <body>
-<nav class="topbar"><div class="top-inner"><div class="logo">📦 My Archive</div></div></nav>
-<div class="layout">
-  <main class="content"><div id="post-list"></div></main>
-</div>
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const list = document.getElementById("post-list");
-    fetch("posts/index.json?v=" + Date.now())
-      .then(r => r.json())
-      .then(posts => {
-        posts.sort((a, b) => new Date(b.date) - new Date(a.date));
-        posts.forEach(p => {
-          const item = document.createElement("div");
-          item.className = "post-item";
-          item.innerHTML = `<h3>${p.title}</h3><span class="date">${p.date}</span>`;
-          
-          item.onclick = () => {
-            // ⭐ 파일명에 아무것도 강제로 붙이지 않고, index.json에 적힌 그대로만 연결합니다.
-            location.href = `viewer.html?post=posts/${p.file}&from=home`;
-          };
-          list.appendChild(item);
+    <nav class="topbar">
+        <div class="top-inner">
+            <div class="logo">📦 My Archive</div>
+            <div class="top-links">
+                <a href="index.html">Home</a>
+                <a href="index.html?cat=diary">Diary</a>
+                <a href="index.html?cat=photos">Photos</a>
+            </div>
+            <button class="menu-btn" id="menuBtn">☰</button>
+        </div>
+    </nav>
+
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div id="sub-menu"></div>
+        </aside>
+
+        <main class="content">
+            <div id="post-list"></div>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('menuBtn').onclick = () => {
+            document.getElementById('sidebar').classList.toggle('open');
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const list = document.getElementById('post-list');
+            const subMenu = document.getElementById('sub-menu');
+            const params = new URLSearchParams(location.search);
+            const category = params.get('cat');
+            const sub = params.get('sub');
+
+            fetch('posts/index.json')
+                .then(res => res.json())
+                .then(posts => {
+                    let filtered = posts;
+                    if (category) filtered = filtered.filter(p => p.category === category);
+
+                    // 사이드바 카테고리 생성 (Diary 전용)
+                    if (category === 'diary') {
+                        const subs = [...new Set(posts.filter(p => p.category === 'diary' && p.sub).map(p => p.sub))];
+                        if (subs.length > 0) {
+                            let html = `<a href="index.html?cat=diary" class="${!sub ? 'active' : ''}">전체</a>`;
+                            subs.forEach(s => {
+                                html += `<a href="index.html?cat=diary&sub=${encodeURIComponent(s)}" class="${sub === s ? 'active' : ''}">${s}</a>`;
+                            });
+                            subMenu.innerHTML = html;
+                        }
+                    }
+
+                    if (sub) filtered = filtered.filter(p => p.sub === sub);
+                    filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                    list.innerHTML = '';
+                    filtered.forEach(p => {
+                        const item = document.createElement('div');
+                        item.className = 'post-item';
+                        item.innerHTML = `
+                            <h3>${p.title}</h3>
+                            <div class="date">${p.date}</div>
+                            <p>${p.excerpt || '내용 보기...'}</p>
+                        `;
+                        item.onclick = () => {
+                            const from = category === 'diary' ? (sub ? `diary-${sub}` : 'diary-all') : 'home';
+                            location.href = `viewer.html?post=posts/${p.file}&from=${from}`;
+                        };
+                        list.appendChild(item);
+                    });
+                });
         });
-      });
-  });
-</script>
+    </script>
 </body>
 </html>
