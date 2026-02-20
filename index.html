@@ -5,13 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>My Archive</title>
   <link rel="stylesheet" href="style.css"/>
-
-  <script>
-    // 로그인 안 했으면 강제 이동
-    if (!sessionStorage.getItem("auth")) {
-      window.location.href = "login.html";
-    }
-  </script>
 </head>
 <body>
 
@@ -24,7 +17,6 @@
       <a href="index.html">Home</a>
       <a href="index.html?cat=diary">Diary</a>
       <a href="index.html?cat=photos">Photos</a>
-      <a href="#" onclick="logout()">Logout</a>
     </div>
 
     <!-- 모바일 메뉴 버튼 -->
@@ -48,17 +40,12 @@
 </div>
 
 <script>
-  function logout(){
-    sessionStorage.removeItem("auth");
-    window.location.href="login.html";
-  }
-
   // 현재 카테고리 기억 (뒤로가기용)
   const urlParams = new URLSearchParams(window.location.search);
   const currentCat = urlParams.get('cat') || 'home';
   sessionStorage.setItem("currentCategory", currentCat);
 </script>
 
-<script src="script.js?v=3"></script>
+<script src="script.js?v=4"></script>
 </body>
 </html>
