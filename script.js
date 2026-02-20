@@ -27,113 +27,99 @@ document.addEventListener("DOMContentLoaded", function () {
 
           const item = document.createElement("div");
           item.className = "photo-card";
+          item.innerHTML = `<img src="${img.src}">`;
 
-          item.innerHTML = `<img src="${img.src}" />`;
-
-          item.onclick = function () {
+          item.onclick = () => {
             location.href = `viewer.html?img=${encodeURIComponent(img.src)}&from=photos`;
           };
 
           list.appendChild(item);
         };
-
       });
     }
-
     return;
   }
 
   // =========================
-  // 📝 POSTS (Cloudflare 방식)
+  // 📝 POSTS (Cloudflare 안정판)
   // =========================
 
-  fetch("posts/")
-    .then(res => res.text())
-    .then(html => {
+  fetch("posts/_list.json")
+    .then(res => res.json())
+    .then(files => {
 
-      // posts 폴더 안 json 파일명 추출
-      const files = [...html.matchAll(/href="([\d-]+\.json)"/g)]
-        .map(m => m[1]);
-
-      if (files.length === 0) {
+      if (!files.length) {
         list.innerHTML = "글이 없습니다.";
         return;
       }
 
-      // 각 json 로드
-      Promise.all(
-        files.map(f =>
-          fetch(`posts/${f}`).then(r => r.json())
-        )
-      ).then(originalPosts => {
+      return Promise.all(
+        files.map(f => fetch(`posts/${f}`).then(r => r.json()))
+      );
+    })
+    .then(originalPosts => {
 
-        let posts = [...originalPosts];
+      let posts = [...originalPosts];
 
-        if (category) {
-          posts = posts.filter(p => p.category === category);
-        }
+      if (category) {
+        posts = posts.filter(p => p.category === category);
+      }
 
-        // 서브메뉴
-        if (category === "diary") {
+      // 서브메뉴
+      if (category === "diary") {
 
-          const subs = [];
+        const subs = [];
 
-          originalPosts.forEach(p => {
-            if (p.category === "diary" && p.sub && !subs.includes(p.sub)) {
-              subs.push(p.sub);
-            }
-          });
-
-          if (subs.length > 0) {
-            let html = '<div class="sub-links">';
-            html += `<a href="index.html?cat=diary"${!sub ? ' class="active"' : ''}>전체</a>`;
-
-            subs.forEach(s => {
-              html += `<a href="index.html?cat=diary&sub=${encodeURIComponent(s)}"${
-                sub === s ? ' class="active"' : ''
-              }>${s}</a>`;
-            });
-
-            html += '</div>';
-            subMenu.innerHTML = html;
+        originalPosts.forEach(p => {
+          if (p.category === "diary" && p.sub && !subs.includes(p.sub)) {
+            subs.push(p.sub);
           }
-        }
-
-        if (sub) {
-          posts = posts.filter(p => p.sub === sub);
-        }
-
-        // 날짜 정렬
-        posts.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-        list.innerHTML = "";
-
-        posts.forEach(post => {
-
-          const item = document.createElement("div");
-          item.className = "post-item";
-
-          item.innerHTML = `
-            <h3>${post.title}</h3>
-            <span class="date">${post.date}</span>
-            <p>${post.excerpt || "내용 보기"}</p>
-          `;
-
-          item.onclick = function () {
-
-            let from = "home";
-
-            if (category === "diary") {
-              from = sub ? `diary-${sub}` : "diary-all";
-            }
-
-            location.href =
-              `viewer.html?post=posts/${post.date}.json&from=${encodeURIComponent(from)}`;
-          };
-
-          list.appendChild(item);
         });
 
+        if (subs.length) {
+          let html = `<div class="sub-links">`;
+          html += `<a href="index.html?cat=diary"${!sub ? ' class="active"' : ''}>전체</a>`;
+
+          subs.forEach(s => {
+            html += `<a href="index.html?cat=diary&sub=${encodeURIComponent(s)}"${
+              sub === s ? ' class="active"' : ''
+            }>${s}</a>`;
+          });
+
+          html += `</div>`;
+          subMenu.innerHTML = html;
+        }
+      }
+
+      if (sub) {
+        posts = posts.filter(p => p.sub === sub);
+      }
+
+      posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      list.innerHTML = "";
+
+      posts.forEach(post => {
+
+        const item = document.createElement("div");
+        item.className = "post-item";
+
+        item.innerHTML = `
+          <h3>${post.title}</h3>
+          <span class="date">${post.date}</span>
+          <p>${post.excerpt || "내용 보기"}</p>
+        `;
+
+        item.onclick = () => {
+          let from = "home";
+          if (category === "diary") {
+            from = sub ? `diary-${sub}` : "diary-all";
+          }
+          location.href =
+            `viewer.html?post=posts/${post.date}.json&from=${encodeURIComponent(from)}`;
+        };
+
+        list.appendChild(item);
       });
 
     })
