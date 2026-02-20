@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
 
   const list = document.getElementById("post-list");
   const subMenu = document.getElementById("sub-menu");
@@ -7,10 +7,9 @@ document.addEventListener("DOMContentLoaded", function () {
   const category = params.get("cat");
   const sub = params.get("sub");
 
+  // 📸 Photos
   if (category === "photos") {
     list.className = "photo-grid";
-    list.innerHTML = "";
-
     const formats = ["jpg","jpeg","png","webp","gif"];
     for (let i = 1; i <= 300; i++) {
       formats.forEach(ext => {
@@ -29,33 +28,16 @@ document.addEventListener("DOMContentLoaded", function () {
     return;
   }
 
-  fetch("posts/_list.json")
+  // 📝 POSTS
+  fetch("posts/index.json")
     .then(r => r.json())
-    .then(files =>
-      Promise.all(
-        files.map(f =>
-          fetch(`posts/${f}`).then(r => r.ok ? r.json() : null).catch(() => null)
-        )
-      )
-    )
-    .then(all => {
-      const originalPosts = all.filter(Boolean);
-      if (!originalPosts.length) {
-        list.innerHTML = "글이 없습니다.";
-        return;
-      }
+    .then(originalPosts => {
 
       let posts = [...originalPosts];
       if (category) posts = posts.filter(p => p.category === category);
 
       if (category === "diary") {
-        const subs = [];
-        originalPosts.forEach(p => {
-          if (p.category === "diary" && p.sub && !subs.includes(p.sub)) {
-            subs.push(p.sub);
-          }
-        });
-
+        const subs = [...new Set(originalPosts.filter(p => p.sub).map(p => p.sub))];
         if (subs.length) {
           subMenu.innerHTML =
             `<a href="index.html?cat=diary">전체</a>` +
