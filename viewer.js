@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  // 🔐 로그인 체크 (HTML 말고 JS에서만)
+  // 🔐 로그인 체크 (viewer에서만)
   if (!sessionStorage.getItem("auth")) {
     location.href = "login.html";
     return;
@@ -65,6 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .then(p => {
 
+      // 이미지
       const images = Array.isArray(p.images)
         ? p.images.map(i => `
           <div class="img-wrap">
@@ -73,6 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
         `).join("")
         : "";
 
+      // 텍스트 / content 둘 다 대응
       const loadContent = p.text
         ? fetch(p.text).then(r => r.text())
         : Promise.resolve(p.content || "");
@@ -81,6 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const content = txt.replace(/\n/g, "<br>");
 
+        // 🔙 뒤로가기 판단
         let backHref = "index.html";
         let backText = "← Home으로 돌아가기";
 
@@ -116,6 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         `;
 
+        // 이미지 확대
         const modal = document.getElementById("imgModal");
         const modalImg = document.getElementById("modalImg");
 
