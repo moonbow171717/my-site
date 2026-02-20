@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
     list.innerHTML = "";
 
     const formats = ["jpg","jpeg","png","webp","gif"];
+
     for (let i = 1; i <= 300; i++) {
       formats.forEach(ext => {
         const img = new Image();
@@ -39,15 +40,20 @@ document.addEventListener("DOMContentLoaded", () => {
     .then(r => r.json())
     .then(originalPosts => {
 
-      // 🔒 유효한 글만 남김 (undefined 카드 제거 핵심)
-      const validPosts = originalPosts.filter(p => p && p.title && p.date);
+      // 🔒 undefined 제거
+      const validPosts = originalPosts.filter(
+        p => p && p.title && p.date
+      );
 
       let posts = [...validPosts];
       if (category) posts = posts.filter(p => p.category === category);
 
       // 서브메뉴
       if (category === "diary") {
-        const subs = [...new Set(validPosts.filter(p => p.sub).map(p => p.sub))];
+        const subs = [...new Set(
+          validPosts.filter(p => p.sub).map(p => p.sub)
+        )];
+
         if (subs.length) {
           subMenu.innerHTML =
             `<a href="index.html?cat=diary"${!sub ? ' class="active"' : ''}>전체</a>` +
