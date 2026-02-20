@@ -6,7 +6,6 @@
   <title>Post</title>
   <link rel="stylesheet" href="style.css">
 
-  <!-- 🔐 로그인 체크 -->
   <script>
     if (!sessionStorage.getItem("auth")) {
       location.href = "login.html";
@@ -38,7 +37,7 @@
   </main>
 </div>
 
-<script src="viewer.js?v=3"></script>
+<script src="viewer.js?v=4"></script>
 <script>
   document.getElementById("menuBtn").onclick = () => {
     document.getElementById("sidebar").classList.toggle("open");
