@@ -23,8 +23,10 @@ document.addEventListener("DOMContentLoaded", () => {
           const item = document.createElement("div");
           item.className = "photo-card";
           item.innerHTML = `<img src="${img.src}">`;
-          item.onclick = () =>
-            location.href = `viewer.html?img=${encodeURIComponent(img.src)}&from=photos`;
+          item.onclick = () => {
+            location.href =
+              `viewer.html?img=${encodeURIComponent(img.src)}&from=photos`;
+          };
           list.appendChild(item);
         };
       });
@@ -59,11 +61,13 @@ document.addEventListener("DOMContentLoaded", () => {
         )];
 
         if (subs.length) {
-          let html = `<a href="index.html?cat=diary"${!sub ? ' class="active"' : ''}>전체</a>`;
+          let html =
+            `<a href="index.html?cat=diary"${!sub ? ' class="active"' : ''}>전체</a>`;
           subs.forEach(s => {
-            html += `<a href="index.html?cat=diary&sub=${encodeURIComponent(s)}"${
-              sub === s ? ' class="active"' : ''
-            }>${s}</a>`;
+            html +=
+              `<a href="index.html?cat=diary&sub=${encodeURIComponent(s)}"${
+                sub === s ? ' class="active"' : ''
+              }>${s}</a>`;
           });
           subMenu.innerHTML = html;
         }
@@ -86,7 +90,9 @@ document.addEventListener("DOMContentLoaded", () => {
           <p>${p.excerpt || "내용 보기"}</p>
         `;
         item.onclick = () => {
-          location.href = `viewer.html?post=posts/${p.id}.json&from=home`;
+          // ✅ 여기 핵심
+          location.href =
+            `viewer.html?post=${encodeURIComponent(p.file)}&from=home`;
         };
         list.appendChild(item);
       });
