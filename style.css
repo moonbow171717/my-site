@@ -11,10 +11,10 @@ body {
 .topbar {
   position: sticky;
   top: 0;
-  background: rgba(15, 17, 21, 0.9); /* 모바일 가독성을 위해 불투명도 조절 */
+  background: rgba(15, 17, 21, 0.9);
   backdrop-filter: blur(16px);
   border-bottom: 1px solid #1f232c;
-  z-index: 1000; /* 상단바를 최상단으로 */
+  z-index: 1000;
 }
 
 .top-inner {
@@ -28,7 +28,7 @@ body {
 
 .logo {
   font-weight: 600;
-  font-size: 16px; /* 약간 키움 */
+  font-size: 16px;
   opacity: 0.9;
 }
 
@@ -45,11 +45,11 @@ body {
 }
 
 .menu-btn {
-  display: none; /* 기본 숨김 */
-  background: #1f232c; /* 버튼 배경색 추가 */
+  display: none;
+  background: #1f232c;
   border: 1px solid #333;
-  color: #fff; /* 버튼 색상 흰색으로 */
-  font-size: 22px; /* 아이콘 크기 키움 */
+  color: #fff;
+  font-size: 22px;
   cursor: pointer;
   padding: 4px 10px;
   border-radius: 6px;
@@ -254,41 +254,50 @@ body {
     margin: 20px auto;
   }
 
-  /* 사이드바 숨김 해제 및 절대 위치 설정 */
   .sidebar {
     display: none;
     width: 100%;
     box-sizing: border-box;
   }
 
-  /* 메뉴 활성화 상태: 상단바 바로 아래에 배치 */
+  /* 🎨 모바일 메뉴 디자인 업그레이드 */
   .sidebar.open {
     display: block !important;
-    background: #171a21;
-    padding: 15px;
-    border-radius: 12px;
-    border: 1px solid #333;
-    margin-bottom: 20px;
+    background: #1c2028; /* 세련된 다크 그레이 */
+    padding: 8px 0;
+    border-radius: 16px;
+    border: 1px solid #2a3040;
+    margin-bottom: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     animation: slideDown 0.3s ease-out;
+    overflow: hidden;
   }
 
   .sidebar a {
-    padding: 12px 10px; /* 클릭 영역 확대 */
-    border-bottom: 1px solid #1f232c;
+    padding: 14px 20px;
+    border-bottom: 1px solid #252a35;
     margin-bottom: 0;
     font-size: 15px;
+    color: #b5bac7;
+    font-weight: 500;
   }
 
   .sidebar a:last-child {
     border-bottom: none;
   }
 
+  /* 모바일 메인 메뉴 영역 (Home, Diary, Photos) */
+  .mobile-main-menu a {
+    background: #232833;
+    color: #fff !important;
+  }
+
   .menu-btn {
-    display: block !important; /* 모바일에서 확실하게 보임 */
+    display: block !important;
   }
 
   .top-links {
-    display: none !important; /* 모바일에서 텍스트 메뉴 확실히 숨김 */
+    display: none !important;
   }
 }
 
