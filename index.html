@@ -2,85 +2,32 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>My Archive v4</title>
+  <title>My Archive v5</title>
   <link rel="stylesheet" href="style.css"/>
   <script>
-    if (!sessionStorage.getItem("auth")) {
-      location.href = "login.html";
-    }
+    if (!sessionStorage.getItem("auth")) { location.href = "login.html"; }
   </script>
 </head>
 <body>
-
-<nav class="topbar">
-  <div class="top-inner">
-    <div class="logo">📦 My Archive</div>
-    <div class="top-links">
-      <a href="index.html">Home</a>
-      <a href="index.html?cat=diary">Diary</a>
-      <a href="index.html?cat=photos">Photos</a>
-    </div>
-    <button class="menu-btn" id="menuBtn">☰</button>
-  </div>
-</nav>
-
+<nav class="topbar"><div class="top-inner"><div class="logo">📦 My Archive</div></div></nav>
 <div class="layout">
-  <aside class="sidebar" id="sidebar">
-    <div id="sub-menu"></div>
-  </aside>
-  <main class="content">
-    <div id="post-list"></div>
-  </main>
+  <main class="content"><div id="post-list"></div></main>
 </div>
-
 <script>
-  document.getElementById("menuBtn").onclick = () => {
-    document.getElementById("sidebar").classList.toggle("open");
-  };
-
   document.addEventListener("DOMContentLoaded", () => {
     const list = document.getElementById("post-list");
-    const subMenu = document.getElementById("sub-menu");
-    const params = new URLSearchParams(location.search);
-    const category = params.get("cat");
-    const sub = params.get("sub");
-
-    // v=Date.now()를 붙여서 서버 캐시를 강제로 무시하고 index.json을 새로 읽어옵니다.
     fetch("posts/index.json?v=" + Date.now())
       .then(r => r.json())
-      .then(originalPosts => {
-        let posts = originalPosts.filter(p => p && p.title && p.date);
-        if (category) posts = posts.filter(p => p.category === category);
-        
-        if (category === "diary") {
-          const subs = [...new Set(posts.filter(p => p.sub).map(p => p.sub))];
-          if (subs.length) {
-            subMenu.innerHTML = `<a href="index.html?cat=diary"${!sub ? ' class="active"' : ''}>전체</a>` +
-              subs.map(s => `<a href="index.html?cat=diary&sub=${encodeURIComponent(s)}"${sub === s ? ' class="active"' : ''}>${s}</a>`).join("");
-          }
-        }
-
-        if (sub) posts = posts.filter(p => p.sub === sub);
+      .then(posts => {
         posts.sort((a, b) => new Date(b.date) - new Date(a.date));
-        list.innerHTML = "";
-
         posts.forEach(p => {
           const item = document.createElement("div");
           item.className = "post-item";
-          item.innerHTML = `<h3>${p.title}</h3><span class="date">${p.date}</span><p>${p.excerpt || "내용 보기"}</p>`;
-
+          item.innerHTML = `<h3>${p.title}</h3><span class="date">${p.date}</span>`;
+          
           item.onclick = () => {
-            let from = category === "diary" ? (sub ? `diary-${sub}` : "diary-all") : "home";
-            
-            // ⭐ 핵심: index.json의 file 항목에 적힌 이름을 최우선으로 사용함
-            let fileName = p.file ? p.file : p.date;
-            
-            if (!fileName.endsWith('.json')) {
-              fileName += '.json';
-            }
-
-            location.href = `viewer.html?post=posts/${fileName}&from=${encodeURIComponent(from)}`;
+            // ⭐ 파일명에 아무것도 강제로 붙이지 않고, index.json에 적힌 그대로만 연결합니다.
+            location.href = `viewer.html?post=posts/${p.file}&from=home`;
           };
           list.appendChild(item);
         });
