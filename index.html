@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>My Archive v2</title>
+  <title>My Archive v3</title>
   <link rel="stylesheet" href="style.css"/>
   <script>
     if (!sessionStorage.getItem("auth")) {
@@ -46,7 +46,7 @@
     const category = params.get("cat");
     const sub = params.get("sub");
 
-    // v= 뒤에 숫자를 계속 바꿔서 서버가 새 파일을 가져오게 합니다.
+    // v=Date.now()를 붙여서 서버가 무조건 최신 index.json을 가져오게 합니다.
     fetch("posts/index.json?v=" + Date.now())
       .then(r => r.json())
       .then(originalPosts => {
@@ -73,17 +73,14 @@
           item.onclick = () => {
             let from = category === "diary" ? (sub ? `diary-${sub}` : "diary-all") : "home";
             
-            // 핵심 로직: file 항목이 있으면 무조건 1순위로 사용
+            // ⭐ 핵심 수정: 무조건 file 항목을 최우선으로 사용합니다.
             let fileName = p.file ? p.file : p.date;
             
-            // 확장자 처리
             if (!fileName.endsWith('.json')) {
               fileName += '.json';
             }
 
-            const finalPath = `viewer.html?post=posts/${fileName}&from=${encodeURIComponent(from)}`;
-            console.log("이동할 파일명:", fileName);
-            location.href = finalPath;
+            location.href = `viewer.html?post=posts/${fileName}&from=${encodeURIComponent(from)}`;
           };
           list.appendChild(item);
         });
