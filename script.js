@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const formats = ["jpg","jpeg","png","webp","gif"];
 
-    for (let i = 1; i <= 200; i++) {
+    for (let i = 1; i <= 300; i++) {
       formats.forEach(ext => {
 
         const img = new Image();
@@ -44,79 +44,96 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // =========================
-  // 📝 Diary
+  // 📝 POSTS (Cloudflare 방식)
   // =========================
 
-  fetch("posts/index.json")
-    .then(res => res.json())
-    .then(originalPosts => {
+  fetch("posts/")
+    .then(res => res.text())
+    .then(html => {
 
-      let posts = [...originalPosts];
+      // posts 폴더 안 json 파일명 추출
+      const files = [...html.matchAll(/href="([\d-]+\.json)"/g)]
+        .map(m => m[1]);
 
-      if (category) {
-        posts = posts.filter(p => p.category === category);
+      if (files.length === 0) {
+        list.innerHTML = "글이 없습니다.";
+        return;
       }
 
-      // 서브메뉴
-      if (category === "diary") {
+      // 각 json 로드
+      Promise.all(
+        files.map(f =>
+          fetch(`posts/${f}`).then(r => r.json())
+        )
+      ).then(originalPosts => {
 
-        const subs = [];
+        let posts = [...originalPosts];
 
-        originalPosts.forEach(p => {
-          if (p.category === "diary" && p.sub && !subs.includes(p.sub)) {
-            subs.push(p.sub);
-          }
-        });
+        if (category) {
+          posts = posts.filter(p => p.category === category);
+        }
 
-        if (subs.length > 0) {
+        // 서브메뉴
+        if (category === "diary") {
 
-          let html = '<div class="sub-links">';
-          html += `<a href="index.html?cat=diary"${!sub ? ' class="active"' : ''}>전체</a>`;
+          const subs = [];
 
-          subs.forEach(s => {
-            html += `<a href="index.html?cat=diary&sub=${encodeURIComponent(s)}"${
-              sub === s ? ' class="active"' : ''
-            }>${s}</a>`;
+          originalPosts.forEach(p => {
+            if (p.category === "diary" && p.sub && !subs.includes(p.sub)) {
+              subs.push(p.sub);
+            }
           });
 
-          html += '</div>';
-          subMenu.innerHTML = html;
-        }
-      }
+          if (subs.length > 0) {
+            let html = '<div class="sub-links">';
+            html += `<a href="index.html?cat=diary"${!sub ? ' class="active"' : ''}>전체</a>`;
 
-      if (sub) {
-        posts = posts.filter(p => p.sub === sub);
-      }
+            subs.forEach(s => {
+              html += `<a href="index.html?cat=diary&sub=${encodeURIComponent(s)}"${
+                sub === s ? ' class="active"' : ''
+              }>${s}</a>`;
+            });
 
-      // 🔥 날짜 기준 정렬
-      posts.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-      list.innerHTML = "";
-
-      posts.forEach(post => {
-
-        const item = document.createElement("div");
-        item.className = "post-item";
-
-        item.innerHTML = `
-          <h3>${post.title}</h3>
-          <span class="date">${post.date}</span>
-          <p>${post.excerpt}</p>
-        `;
-
-        item.onclick = function () {
-
-          let from = "home";
-
-          if (category === "diary") {
-            from = sub ? `diary-${sub}` : "diary-all";
+            html += '</div>';
+            subMenu.innerHTML = html;
           }
+        }
 
-          // 🔥 id 안씀 → date로 바로 파일 열기
-          location.href = `viewer.html?post=posts/${post.date}.json&from=${encodeURIComponent(from)}`;
-        };
+        if (sub) {
+          posts = posts.filter(p => p.sub === sub);
+        }
 
-        list.appendChild(item);
+        // 날짜 정렬
+        posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        list.innerHTML = "";
+
+        posts.forEach(post => {
+
+          const item = document.createElement("div");
+          item.className = "post-item";
+
+          item.innerHTML = `
+            <h3>${post.title}</h3>
+            <span class="date">${post.date}</span>
+            <p>${post.excerpt || "내용 보기"}</p>
+          `;
+
+          item.onclick = function () {
+
+            let from = "home";
+
+            if (category === "diary") {
+              from = sub ? `diary-${sub}` : "diary-all";
+            }
+
+            location.href =
+              `viewer.html?post=posts/${post.date}.json&from=${encodeURIComponent(from)}`;
+          };
+
+          list.appendChild(item);
+        });
+
       });
 
     })
