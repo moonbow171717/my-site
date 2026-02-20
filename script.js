@@ -1,11 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  // 🔐 로그인 체크 (여기서만!)
-  if (!sessionStorage.getItem("auth")) {
-    location.href = "login.html";
-    return;
-  }
-
   const list = document.getElementById("post-list");
   const subMenu = document.getElementById("sub-menu");
 
@@ -21,6 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
     list.innerHTML = "";
 
     const formats = ["jpg","jpeg","png","webp","gif"];
+
     for (let i = 1; i <= 300; i++) {
       formats.forEach(ext => {
         const img = new Image();
@@ -29,10 +24,8 @@ document.addEventListener("DOMContentLoaded", () => {
           const item = document.createElement("div");
           item.className = "photo-card";
           item.innerHTML = `<img src="${img.src}">`;
-          item.onclick = () => {
-            location.href =
-              `viewer.html?img=${encodeURIComponent(img.src)}&from=photos`;
-          };
+          item.onclick = () =>
+            location.href = `viewer.html?img=${encodeURIComponent(img.src)}&from=photos`;
           list.appendChild(item);
         };
       });
@@ -44,53 +37,35 @@ document.addEventListener("DOMContentLoaded", () => {
   // 📝 Posts
   // =========================
   fetch("posts/index.json")
-    .then(r => {
-      if (!r.ok) throw new Error("index.json 못 불러옴");
-      return r.json();
-    })
+    .then(r => r.json())
     .then(originalPosts => {
 
-      if (!Array.isArray(originalPosts) || originalPosts.length === 0) {
-        list.innerHTML = "글이 없습니다.";
-        return;
-      }
+      // 🔒 undefined 제거
+      const validPosts = originalPosts.filter(
+        p => p && p.title && p.date
+      );
 
-      // ✅ file 있는 글만 사용 (중요)
-      let posts = originalPosts.filter(p => p.file);
+      let posts = [...validPosts];
+      if (category) posts = posts.filter(p => p.category === category);
 
-      if (category) {
-        posts = posts.filter(p => p.category === category);
-      }
-
-      // =========================
-      // 서브메뉴 (Diary)
-      // =========================
+      // 서브메뉴
       if (category === "diary") {
         const subs = [...new Set(
-          originalPosts
-            .filter(p => p.category === "diary" && p.sub)
-            .map(p => p.sub)
+          validPosts.filter(p => p.sub).map(p => p.sub)
         )];
 
         if (subs.length) {
-          let html =
-            `<a href="index.html?cat=diary"${!sub ? ' class="active"' : ''}>전체</a>`;
-
-          subs.forEach(s => {
-            html +=
+          subMenu.innerHTML =
+            `<a href="index.html?cat=diary"${!sub ? ' class="active"' : ''}>전체</a>` +
+            subs.map(s =>
               `<a href="index.html?cat=diary&sub=${encodeURIComponent(s)}"${
                 sub === s ? ' class="active"' : ''
-              }>${s}</a>`;
-          });
-
-          subMenu.innerHTML = html;
+              }>${s}</a>`
+            ).join("");
         }
       }
 
-      if (sub) {
-        posts = posts.filter(p => p.sub === sub);
-      }
-
+      if (sub) posts = posts.filter(p => p.sub === sub);
       posts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
       list.innerHTML = "";
@@ -103,17 +78,12 @@ document.addEventListener("DOMContentLoaded", () => {
           <span class="date">${p.date}</span>
           <p>${p.excerpt || "내용 보기"}</p>
         `;
-
-        item.onclick = () => {
-          location.href =
-            `viewer.html?post=${encodeURIComponent(p.file)}&from=home`;
-        };
-
+        item.onclick = () =>
+          location.href = `viewer.html?post=posts/${p.date}.json&from=home`;
         list.appendChild(item);
       });
     })
-    .catch(err => {
-      console.error(err);
+    .catch(() => {
       list.innerHTML = "글을 불러오지 못했습니다.";
     });
 });
