@@ -46,7 +46,8 @@
     const category = params.get("cat");
     const sub = params.get("sub");
 
-    fetch("posts/index.json?v=" + new Date().getTime()) // 캐시 방지 위해 시간값 추가
+    // 캐시를 완전히 무시하도록 매번 다른 숫자를 붙여서 index.json을 불러옵니다.
+    fetch("posts/index.json?nocache=" + Math.random())
       .then(r => r.json())
       .then(originalPosts => {
         let posts = originalPosts.filter(p => p && p.title && p.date);
@@ -72,23 +73,21 @@
           item.onclick = () => {
             let from = category === "diary" ? (sub ? `diary-${sub}` : "diary-all") : "home";
             
-            // ✅ [절대 해결법] 
-            // 1. 만약 index.json에 file 항목이 있으면 그걸 씁니다.
-            // 2. 만약 제목에 '(하)' 가 들어있으면 강제로 -하 를 붙입니다.
-            // 3. 둘 다 아니면 그냥 날짜를 씁니다.
-            let fileName = p.file || p.date;
+            // ✅ [강력 수정 부분] 날짜보다 file 항목이 있는지 먼저 확인합니다.
+            let targetFile = "";
             
-            if (!p.file && p.title.includes("(하)")) {
-                fileName = p.date + "-하";
+            if (p.file) {
+              targetFile = p.file; // index.json에 file이 적혀있으면 무조건 그걸 씀
+            } else {
+              targetFile = p.date; // 없으면 날짜를 씀
             }
 
-            if (!fileName.endsWith('.json')) {
-              fileName += '.json';
+            // .json 확장자가 안 붙어있으면 붙여줍니다.
+            if (!targetFile.endsWith('.json')) {
+              targetFile += '.json';
             }
 
-            const finalUrl = `viewer.html?post=posts/${fileName}&from=${encodeURIComponent(from)}`;
-            console.log("이동 경로:", finalUrl); // 브라우저 검사창에서 확인용
-            location.href = finalUrl;
+            location.href = `viewer.html?post=posts/${targetFile}&from=${encodeURIComponent(from)}`;
           };
           list.appendChild(item);
         });
