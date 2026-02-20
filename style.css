@@ -260,36 +260,56 @@ body {
     box-sizing: border-box;
   }
 
-  /* 🎨 모바일 메뉴 디자인 업그레이드 */
+  /* 🎨 모바일 메뉴 상자 디자인 */
   .sidebar.open {
     display: block !important;
-    background: #1c2028; /* 세련된 다크 그레이 */
-    padding: 8px 0;
-    border-radius: 16px;
+    background: #171a21;
+    padding: 20px;
+    border-radius: 20px;
     border: 1px solid #2a3040;
     margin-bottom: 25px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.4);
     animation: slideDown 0.3s ease-out;
-    overflow: hidden;
   }
 
-  .sidebar a {
-    padding: 14px 20px;
-    border-bottom: 1px solid #252a35;
-    margin-bottom: 0;
-    font-size: 15px;
-    color: #b5bac7;
-    font-weight: 500;
+  /* 메인 버튼 가로 3칸 배치 */
+  .mobile-main-menu {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #2a3040;
+    padding-bottom: 15px;
   }
 
-  .sidebar a:last-child {
-    border-bottom: none;
-  }
-
-  /* 모바일 메인 메뉴 영역 (Home, Diary, Photos) */
   .mobile-main-menu a {
-    background: #232833;
+    background: #232833 !important;
+    padding: 12px 5px !important;
+    border-radius: 12px !important;
+    font-size: 13px !important;
+    text-align: center;
+    border: none !important;
+    margin-bottom: 0 !important;
     color: #fff !important;
+    font-weight: 600;
+  }
+
+  /* 하위 카테고리(일상 등) 스타일 */
+  #sub-menu a {
+    padding: 12px 15px;
+    margin-bottom: 6px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 10px;
+    border: none;
+    color: #a0a5b5;
+    font-size: 14px;
+    display: block;
+  }
+
+  #sub-menu a.active {
+    background: #313846;
+    color: #fff;
+    font-weight: 600;
   }
 
   .menu-btn {
