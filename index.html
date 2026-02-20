@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>My Archive</title>
   <link rel="stylesheet" href="style.css"/>
+
+  <!-- 🔐 로그인 체크 -->
+  <script>
+    if (!sessionStorage.getItem("auth")) {
+      location.href = "login.html";
+    }
+  </script>
 </head>
 <body>
 
