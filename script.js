@@ -38,7 +38,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // 📝 Posts
   // =========================
   fetch("posts/index.json")
-    .then(r => r.json())
+    .then(r => {
+      if (!r.ok) throw new Error("index.json 못 불러옴");
+      return r.json();
+    })
     .then(originalPosts => {
 
       if (!Array.isArray(originalPosts) || originalPosts.length === 0) {
@@ -46,13 +49,16 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      let posts = [...originalPosts];
+      // 🔒 file 없는 글은 제거 (undefined 방지)
+      let posts = originalPosts.filter(p => p.file);
 
       if (category) {
         posts = posts.filter(p => p.category === category);
       }
 
-      // 서브메뉴
+      // =========================
+      // 서브메뉴 (Diary)
+      // =========================
       if (category === "diary") {
         const subs = [...new Set(
           originalPosts
@@ -63,12 +69,14 @@ document.addEventListener("DOMContentLoaded", () => {
         if (subs.length) {
           let html =
             `<a href="index.html?cat=diary"${!sub ? ' class="active"' : ''}>전체</a>`;
+
           subs.forEach(s => {
             html +=
               `<a href="index.html?cat=diary&sub=${encodeURIComponent(s)}"${
                 sub === s ? ' class="active"' : ''
               }>${s}</a>`;
           });
+
           subMenu.innerHTML = html;
         }
       }
@@ -77,6 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
         posts = posts.filter(p => p.sub === sub);
       }
 
+      // 최신순
       posts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
       list.innerHTML = "";
@@ -89,15 +98,18 @@ document.addEventListener("DOMContentLoaded", () => {
           <span class="date">${p.date}</span>
           <p>${p.excerpt || "내용 보기"}</p>
         `;
+
+        // ✅ 여기서 file을 그대로 viewer로 넘김
         item.onclick = () => {
-          // ✅ 여기 핵심
           location.href =
             `viewer.html?post=${encodeURIComponent(p.file)}&from=home`;
         };
+
         list.appendChild(item);
       });
     })
-    .catch(() => {
+    .catch(err => {
+      console.error(err);
       list.innerHTML = "글을 불러오지 못했습니다.";
     });
 });
