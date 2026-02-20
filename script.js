@@ -41,7 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
     .then(r => r.json())
     .then(originalPosts => {
 
-      // 🔒 안전 필터
       const validPosts = originalPosts.filter(
         p => p && p.title && p.date
       );
@@ -49,9 +48,6 @@ document.addEventListener("DOMContentLoaded", () => {
       let posts = [...validPosts];
       if (category) posts = posts.filter(p => p.category === category);
 
-      // =========================
-      // 서브메뉴
-      // =========================
       if (category === "diary") {
         const subs = [...new Set(
           validPosts.filter(p => p.sub).map(p => p.sub)
@@ -83,16 +79,22 @@ document.addEventListener("DOMContentLoaded", () => {
           <p>${p.excerpt || "내용 보기"}</p>
         `;
 
-        // ✅ 여기 핵심 수정
+        // ✅ 여기가 수정된 핵심 포인트입니다!
         item.onclick = () => {
           let from = "home";
-
           if (category === "diary") {
             from = sub ? `diary-${sub}` : "diary-all";
           }
 
+          // file 항목이 있으면 그걸 쓰고, 없으면 date를 씁니다.
+          let fileName = p.file || p.date;
+          if (!fileName.endsWith('.json')) {
+            fileName += '.json';
+          }
+
+          // 이제 viewer.html로 "정확한 파일 이름"을 보냅니다.
           location.href =
-            `viewer.html?post=posts/${p.date}.json&from=${encodeURIComponent(from)}`;
+            `viewer.html?post=posts/${fileName}&from=${encodeURIComponent(from)}`;
         };
 
         list.appendChild(item);
