@@ -1,8 +1,12 @@
+
 {
   "title": "카페 기록",
-  "date": "2026-02-26",
+  "date": "2025-03-13",
   "category": "diary",
-  "sub": "카페",
-  "images": [],
+   "sub": "카페",
+  "images": [
+    "photos/1.jpg",
+    "photos/2.jpg"
+  ],
   "text": "posts/2025-03-13.txt"
 }
