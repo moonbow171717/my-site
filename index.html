@@ -1,3 +1,39 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>My Archive</title>
+  <link rel="stylesheet" href="style.css"/>
+  <script>
+    if (!sessionStorage.getItem("auth")) {
+      location.href = "login.html";
+    }
+  </script>
+</head>
+<body>
+
+<nav class="topbar">
+  <div class="top-inner">
+    <div class="logo">📦 My Archive</div>
+    <div class="top-links">
+      <a href="index.html">Home</a>
+      <a href="index.html?cat=diary">Diary</a>
+      <a href="index.html?cat=photos">Photos</a>
+    </div>
+    <button class="menu-btn" id="menuBtn">☰</button>
+  </div>
+</nav>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div id="sub-menu"></div>
+  </aside>
+  <main class="content">
+    <div id="post-list"></div>
+  </main>
+</div>
+
 <script>
   document.getElementById("menuBtn").onclick = () => {
     document.getElementById("sidebar").classList.toggle("open");
@@ -10,12 +46,20 @@
     const category = params.get("cat");
     const sub = params.get("sub");
 
+    // posts/index.json을 가져옵니다. 캐시 방지를 위해 현재 시간 파라미터를 붙였습니다.
     fetch("posts/index.json?v=" + new Date().getTime())
-      .then(r => r.json())
+      .then(r => {
+        if (!r.ok) throw new Error("파일을 찾을 수 없습니다.");
+        return r.json();
+      })
       .then(originalPosts => {
+        // 데이터가 유효한지 필터링
         let posts = originalPosts.filter(p => p && p.title && p.date);
+        
+        // 카테고리 필터링
         if (category) posts = posts.filter(p => p.category === category);
         
+        // 서브 메뉴 구성 (diary 카테고리일 때)
         if (category === "diary") {
           const subs = [...new Set(posts.filter(p => p.sub).map(p => p.sub))];
           if (subs.length) {
@@ -24,8 +68,12 @@
           }
         }
 
+        // 서브 카테고리 필터링
         if (sub) posts = posts.filter(p => p.sub === sub);
+        
+        // 최신순 정렬
         posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
         list.innerHTML = "";
 
         posts.forEach(p => {
@@ -36,21 +84,27 @@
           item.onclick = () => {
             let from = category === "diary" ? (sub ? `diary-${sub}` : "diary-all") : "home";
             
-            // ✅ 수정한 부분: 이제 "(하)"가 있든 없든 정직하게 불러옵니다.
-            // 1. file 항목이 있으면 그걸 최우선으로 씁니다.
-            // 2. file 항목이 없으면 date 항목을 파일명으로 씁니다.
+            // ✅ 수정한 핵심 부분: 
+            // 1. file 항목이 있으면 쓰고, 없으면 date를 파일명으로 사용합니다.
+            // 2. 제목에 '(하)'가 있어도 강제로 파일명을 바꾸지 않습니다.
             let fileName = p.file || p.date;
 
-            if (!fileName.endsWith('.json')) {
+            // 확장자 중복 방지
+            if (!fileName.toString().endsWith('.json')) {
               fileName += '.json';
             }
 
             const finalUrl = `viewer.html?post=posts/${fileName}&from=${encodeURIComponent(from)}`;
-            console.log("이동 경로:", finalUrl);
             location.href = finalUrl;
           };
           list.appendChild(item);
         });
+      })
+      .catch(err => {
+        console.error("오류 발생:", err);
+        list.innerHTML = "<p style='padding:20px;'>목록을 불러오는 중 오류가 발생했습니다. index.json 파일을 확인해 주세요.</p>";
       });
   });
 </script>
+</body>
+</html>
