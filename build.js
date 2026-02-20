@@ -4,7 +4,7 @@ const path = require("path");
 const postsDir = path.join(__dirname, "posts");
 
 const files = fs.readdirSync(postsDir)
-  .filter(file => file.endsWith(".json"));
+  .filter(file => file.endsWith(".json") && file !== "index.json");
 
 const index = [];
 
@@ -13,10 +13,8 @@ files.forEach(file => {
   const fullPath = path.join(postsDir, file);
   const data = JSON.parse(fs.readFileSync(fullPath, "utf-8"));
 
-  // 🔥 sub 없으면 기본값 "잡담"
   const subValue = data.sub || "잡담";
 
-  // 🔥 excerpt 자동 생성
   let excerpt = data.excerpt || "";
 
   if (!excerpt && data.text) {
