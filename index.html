@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>My Archive</title>
   <link rel="stylesheet" href="style.css"/>
-
   <script>
     if (!sessionStorage.getItem("auth")) {
       location.href = "login.html";
@@ -17,13 +16,11 @@
 <nav class="topbar">
   <div class="top-inner">
     <div class="logo">📦 My Archive</div>
-
     <div class="top-links">
       <a href="index.html">Home</a>
       <a href="index.html?cat=diary">Diary</a>
       <a href="index.html?cat=photos">Photos</a>
     </div>
-
     <button class="menu-btn" id="menuBtn">☰</button>
   </div>
 </nav>
@@ -32,14 +29,12 @@
   <aside class="sidebar" id="sidebar">
     <div id="sub-menu"></div>
   </aside>
-
   <main class="content">
     <div id="post-list"></div>
   </main>
 </div>
 
 <script>
-  // 메뉴 버튼 동작
   document.getElementById("menuBtn").onclick = () => {
     document.getElementById("sidebar").classList.toggle("open");
   };
@@ -47,53 +42,21 @@
   document.addEventListener("DOMContentLoaded", () => {
     const list = document.getElementById("post-list");
     const subMenu = document.getElementById("sub-menu");
-
     const params = new URLSearchParams(location.search);
     const category = params.get("cat");
     const sub = params.get("sub");
 
-    // =========================
-    // 📸 Photos
-    // =========================
-    if (category === "photos") {
-      list.className = "photo-grid";
-      list.innerHTML = "";
-      const formats = ["jpg","jpeg","png","webp","gif"];
-      for (let i = 1; i <= 300; i++) {
-        formats.forEach(ext => {
-          const img = new Image();
-          img.src = `photos/${i}.${ext}`;
-          img.onload = () => {
-            const item = document.createElement("div");
-            item.className = "photo-card";
-            item.innerHTML = `<img src="${img.src}">`;
-            item.onclick = () =>
-              location.href = `viewer.html?img=${encodeURIComponent(img.src)}&from=photos`;
-            list.appendChild(item);
-          };
-        });
-      }
-      return;
-    }
-
-    // =========================
-    // 📝 Posts
-    // =========================
-    fetch("posts/index.json")
+    fetch("posts/index.json?v=" + new Date().getTime()) // 캐시 방지 위해 시간값 추가
       .then(r => r.json())
       .then(originalPosts => {
-        const validPosts = originalPosts.filter(p => p && p.title && p.date);
-        let posts = [...validPosts];
+        let posts = originalPosts.filter(p => p && p.title && p.date);
         if (category) posts = posts.filter(p => p.category === category);
-
+        
         if (category === "diary") {
-          const subs = [...new Set(validPosts.filter(p => p.sub).map(p => p.sub))];
+          const subs = [...new Set(posts.filter(p => p.sub).map(p => p.sub))];
           if (subs.length) {
-            subMenu.innerHTML =
-              `<a href="index.html?cat=diary"${!sub ? ' class="active"' : ''}>전체</a>` +
-              subs.map(s =>
-                `<a href="index.html?cat=diary&sub=${encodeURIComponent(s)}"${sub === s ? ' class="active"' : ''}>${s}</a>`
-              ).join("");
+            subMenu.innerHTML = `<a href="index.html?cat=diary"${!sub ? ' class="active"' : ''}>전체</a>` +
+              subs.map(s => `<a href="index.html?cat=diary&sub=${encodeURIComponent(s)}"${sub === s ? ' class="active"' : ''}>${s}</a>`).join("");
           }
         }
 
@@ -104,32 +67,31 @@
         posts.forEach(p => {
           const item = document.createElement("div");
           item.className = "post-item";
-          item.innerHTML = `
-            <h3>${p.title}</h3>
-            <span class="date">${p.date}</span>
-            <p>${p.excerpt || "내용 보기"}</p>
-          `;
+          item.innerHTML = `<h3>${p.title}</h3><span class="date">${p.date}</span><p>${p.excerpt || "내용 보기"}</p>`;
 
-          // ✅ [수정 핵심] 주소창에 넘겨줄 파일 이름을 결정하는 부분
           item.onclick = () => {
-            let from = "home";
-            if (category === "diary") {
-              from = sub ? `diary-${sub}` : "diary-all";
+            let from = category === "diary" ? (sub ? `diary-${sub}` : "diary-all") : "home";
+            
+            // ✅ [절대 해결법] 
+            // 1. 만약 index.json에 file 항목이 있으면 그걸 씁니다.
+            // 2. 만약 제목에 '(하)' 가 들어있으면 강제로 -하 를 붙입니다.
+            // 3. 둘 다 아니면 그냥 날짜를 씁니다.
+            let fileName = p.file || p.date;
+            
+            if (!p.file && p.title.includes("(하)")) {
+                fileName = p.date + "-하";
             }
 
-            // file 항목이 있으면 쓰고, 없으면 date를 씁니다.
-            let fileName = p.file || p.date;
             if (!fileName.endsWith('.json')) {
               fileName += '.json';
             }
 
-            location.href = `viewer.html?post=posts/${fileName}&from=${encodeURIComponent(from)}`;
+            const finalUrl = `viewer.html?post=posts/${fileName}&from=${encodeURIComponent(from)}`;
+            console.log("이동 경로:", finalUrl); // 브라우저 검사창에서 확인용
+            location.href = finalUrl;
           };
           list.appendChild(item);
         });
-      })
-      .catch(() => {
-        list.innerHTML = "글을 불러오지 못했습니다.";
       });
   });
 </script>
