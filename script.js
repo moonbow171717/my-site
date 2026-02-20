@@ -1,5 +1,11 @@
 document.addEventListener("DOMContentLoaded", function () {
 
+  // 🔐 로그인 체크 (HTML 말고 JS에서만)
+  if (!sessionStorage.getItem("auth")) {
+    location.href = "login.html";
+    return;
+  }
+
   const list = document.getElementById("post-list");
   const subMenu = document.getElementById("sub-menu");
 
@@ -24,13 +30,13 @@ document.addEventListener("DOMContentLoaded", function () {
         img.src = `photos/${i}.${ext}`;
 
         img.onload = function () {
-
           const item = document.createElement("div");
           item.className = "photo-card";
           item.innerHTML = `<img src="${img.src}">`;
 
           item.onclick = () => {
-            location.href = `viewer.html?img=${encodeURIComponent(img.src)}&from=photos`;
+            location.href =
+              `viewer.html?img=${encodeURIComponent(img.src)}&from=photos`;
           };
 
           list.appendChild(item);
@@ -41,36 +47,43 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // =========================
-  // 📝 POSTS (Cloudflare 안정판)
+  // 📝 POSTS
   // =========================
 
   fetch("posts/_list.json")
     .then(res => res.json())
     .then(files => {
 
-      if (!files.length) {
+      if (!Array.isArray(files) || files.length === 0) {
         list.innerHTML = "글이 없습니다.";
-        return;
+        return [];
       }
 
       return Promise.all(
-        files.map(f => fetch(`posts/${f}`).then(r => r.json()))
+        files.map(f =>
+          fetch(`posts/${f}`)
+            .then(r => r.json())
+            .catch(() => null)
+        )
       );
     })
     .then(originalPosts => {
 
-      let posts = [...originalPosts];
+      const validPosts = originalPosts.filter(Boolean);
+      let posts = [...validPosts];
 
       if (category) {
         posts = posts.filter(p => p.category === category);
       }
 
-      // 서브메뉴
+      // =========================
+      // 📂 DIARY 서브메뉴
+      // =========================
       if (category === "diary") {
 
         const subs = [];
 
-        originalPosts.forEach(p => {
+        validPosts.forEach(p => {
           if (p.category === "diary" && p.sub && !subs.includes(p.sub)) {
             subs.push(p.sub);
           }
@@ -78,7 +91,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (subs.length) {
           let html = `<div class="sub-links">`;
-          html += `<a href="index.html?cat=diary"${!sub ? ' class="active"' : ''}>전체</a>`;
+          html += `<a href="index.html?cat=diary"${
+            !sub ? ' class="active"' : ''
+          }>전체</a>`;
 
           subs.forEach(s => {
             html += `<a href="index.html?cat=diary&sub=${encodeURIComponent(s)}"${
@@ -98,6 +113,11 @@ document.addEventListener("DOMContentLoaded", function () {
       posts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
       list.innerHTML = "";
+
+      if (posts.length === 0) {
+        list.innerHTML = "글이 없습니다.";
+        return;
+      }
 
       posts.forEach(post => {
 
