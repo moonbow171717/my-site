@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>My Archive</title>
+  <title>My Archive v2</title>
   <link rel="stylesheet" href="style.css"/>
   <script>
     if (!sessionStorage.getItem("auth")) {
@@ -46,8 +46,8 @@
     const category = params.get("cat");
     const sub = params.get("sub");
 
-    // 캐시를 완전히 무시하도록 매번 다른 숫자를 붙여서 index.json을 불러옵니다.
-    fetch("posts/index.json?nocache=" + Math.random())
+    // v= 뒤에 숫자를 계속 바꿔서 서버가 새 파일을 가져오게 합니다.
+    fetch("posts/index.json?v=" + Date.now())
       .then(r => r.json())
       .then(originalPosts => {
         let posts = originalPosts.filter(p => p && p.title && p.date);
@@ -73,21 +73,17 @@
           item.onclick = () => {
             let from = category === "diary" ? (sub ? `diary-${sub}` : "diary-all") : "home";
             
-            // ✅ [강력 수정 부분] 날짜보다 file 항목이 있는지 먼저 확인합니다.
-            let targetFile = "";
+            // 핵심 로직: file 항목이 있으면 무조건 1순위로 사용
+            let fileName = p.file ? p.file : p.date;
             
-            if (p.file) {
-              targetFile = p.file; // index.json에 file이 적혀있으면 무조건 그걸 씀
-            } else {
-              targetFile = p.date; // 없으면 날짜를 씀
+            // 확장자 처리
+            if (!fileName.endsWith('.json')) {
+              fileName += '.json';
             }
 
-            // .json 확장자가 안 붙어있으면 붙여줍니다.
-            if (!targetFile.endsWith('.json')) {
-              targetFile += '.json';
-            }
-
-            location.href = `viewer.html?post=posts/${targetFile}&from=${encodeURIComponent(from)}`;
+            const finalPath = `viewer.html?post=posts/${fileName}&from=${encodeURIComponent(from)}`;
+            console.log("이동할 파일명:", fileName);
+            location.href = finalPath;
           };
           list.appendChild(item);
         });
