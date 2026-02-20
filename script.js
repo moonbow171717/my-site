@@ -7,9 +7,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const category = params.get("cat");
   const sub = params.get("sub");
 
+  // =========================
   // 📸 Photos
+  // =========================
   if (category === "photos") {
     list.className = "photo-grid";
+    list.innerHTML = "";
+
     const formats = ["jpg","jpeg","png","webp","gif"];
     for (let i = 1; i <= 300; i++) {
       formats.forEach(ext => {
@@ -28,29 +32,38 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // 📝 POSTS
+  // =========================
+  // 📝 Posts
+  // =========================
   fetch("posts/index.json")
     .then(r => r.json())
     .then(originalPosts => {
 
-      let posts = [...originalPosts];
+      // 🔒 유효한 글만 남김 (undefined 카드 제거 핵심)
+      const validPosts = originalPosts.filter(p => p && p.title && p.date);
+
+      let posts = [...validPosts];
       if (category) posts = posts.filter(p => p.category === category);
 
+      // 서브메뉴
       if (category === "diary") {
-        const subs = [...new Set(originalPosts.filter(p => p.sub).map(p => p.sub))];
+        const subs = [...new Set(validPosts.filter(p => p.sub).map(p => p.sub))];
         if (subs.length) {
           subMenu.innerHTML =
-            `<a href="index.html?cat=diary">전체</a>` +
+            `<a href="index.html?cat=diary"${!sub ? ' class="active"' : ''}>전체</a>` +
             subs.map(s =>
-              `<a href="index.html?cat=diary&sub=${encodeURIComponent(s)}">${s}</a>`
+              `<a href="index.html?cat=diary&sub=${encodeURIComponent(s)}"${
+                sub === s ? ' class="active"' : ''
+              }>${s}</a>`
             ).join("");
         }
       }
 
       if (sub) posts = posts.filter(p => p.sub === sub);
-      posts.sort((a,b) => new Date(b.date) - new Date(a.date));
+      posts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
       list.innerHTML = "";
+
       posts.forEach(p => {
         const item = document.createElement("div");
         item.className = "post-item";
