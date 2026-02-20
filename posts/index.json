@@ -35,9 +35,10 @@
     "date": "2026-02-25",
     "file": "2026-02-25",
     "category": "diary",
-    "sub": "일상"
+    "sub": "일상",
+    "excerpt": "이제 편하다"
   },
-  {
+{
     "title": "연애 포기 각서 (상)",
     "date": "2026-02-21",
     "file": "2026-02-21",
@@ -51,11 +52,11 @@
     "category": "diary",
     "sub": "연애 포기 각서"
   },
-  {
-    "title": "홈스윗홈 (상)",
-    "date": "2026-02-21",
-    "file": "home-sweet-1.json",
-    "category": "diary",
-    "sub": "홈스윗홈"
-  }
+ {
+  "title": "홈스윗홈 (상)",
+  "date": "2026-02-21",
+  "file": "1900-01-01",
+  "category": "diary",
+  "sub": "홈스윗홈"
+}
 ]
