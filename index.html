@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>My Archive v3</title>
+  <title>My Archive v4</title>
   <link rel="stylesheet" href="style.css"/>
   <script>
     if (!sessionStorage.getItem("auth")) {
@@ -46,7 +46,7 @@
     const category = params.get("cat");
     const sub = params.get("sub");
 
-    // v=Date.now()를 붙여서 서버가 무조건 최신 index.json을 가져오게 합니다.
+    // v=Date.now()를 붙여서 서버 캐시를 강제로 무시하고 index.json을 새로 읽어옵니다.
     fetch("posts/index.json?v=" + Date.now())
       .then(r => r.json())
       .then(originalPosts => {
@@ -73,7 +73,7 @@
           item.onclick = () => {
             let from = category === "diary" ? (sub ? `diary-${sub}` : "diary-all") : "home";
             
-            // ⭐ 핵심 수정: 무조건 file 항목을 최우선으로 사용합니다.
+            // ⭐ 핵심: index.json의 file 항목에 적힌 이름을 최우선으로 사용함
             let fileName = p.file ? p.file : p.date;
             
             if (!fileName.endsWith('.json')) {
@@ -89,4 +89,3 @@
 </script>
 </body>
 </html>
-
