@@ -1,19 +1,29 @@
 document.addEventListener("DOMContentLoaded", () => {
-
   const list = document.getElementById("post-list");
   const subMenu = document.getElementById("sub-menu");
+  const menuBtn = document.getElementById("menuBtn");
+  const sidebar = document.getElementById("sidebar");
+
+  // ☰ 버튼 클릭 기능 연결
+  if (menuBtn) {
+    menuBtn.onclick = () => {
+      sidebar.classList.toggle("open");
+    };
+  }
 
   const params = new URLSearchParams(location.search);
   const category = params.get("cat");
   const sub = params.get("sub");
 
   // =========================
-  // 📸 Photos
+  // 📸 Photos 로직
   // =========================
   if (category === "photos") {
+    // 사진첩일 때도 사이드바 메뉴에 글자를 넣어줍니다.
+    subMenu.innerHTML = `<a href="index.html?cat=photos" class="active">모든 사진</a><a href="index.html">홈으로</a>`;
+    
     list.className = "photo-grid";
     list.innerHTML = "";
-
     const formats = ["jpg","jpeg","png","webp","gif"];
 
     for (let i = 1; i <= 300; i++) {
@@ -25,8 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
           item.className = "photo-card";
           item.innerHTML = `<img src="${img.src}">`;
           item.onclick = () =>
-            location.href =
-              `viewer.html?img=${encodeURIComponent(img.src)}&from=photos`;
+            location.href = `viewer.html?img=${encodeURIComponent(img.src)}&from=photos`;
           list.appendChild(item);
         };
       });
@@ -35,39 +44,37 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================
-  // 📝 Posts
+  // 📝 Posts 로직
   // =========================
-  fetch("posts/index.json")
+  fetch("posts/index.json?v=" + new Date().getTime()) // 캐시 방지 추가
     .then(r => r.json())
     .then(originalPosts => {
-
-      const validPosts = originalPosts.filter(
-        p => p && p.title && p.date
-      );
-
+      const validPosts = originalPosts.filter(p => p && p.title && p.date);
       let posts = [...validPosts];
-      if (category) posts = posts.filter(p => p.category === category);
 
+      // 사이드바 메뉴 구성 (Diary 카테고리일 때 특히 중요)
       if (category === "diary") {
-        const subs = [...new Set(
-          validPosts.filter(p => p.sub).map(p => p.sub)
-        )];
-
+        const subs = [...new Set(validPosts.filter(p => p.sub).map(p => p.sub))];
         if (subs.length) {
           subMenu.innerHTML =
-            `<a href="index.html?cat=diary"${!sub ? ' class="active"' : ''}>전체</a>` +
+            `<a href="index.html?cat=diary"${!sub ? ' class="active"' : ''}>전체 기록</a>` +
             subs.map(s =>
               `<a href="index.html?cat=diary&sub=${encodeURIComponent(s)}"${
                 sub === s ? ' class="active"' : ''
               }>${s}</a>`
             ).join("");
+        } else {
+          subMenu.innerHTML = `<a href="index.html?cat=diary" class="active">전체 기록</a>`;
         }
+      } else {
+        // 홈 화면 등 다른 곳에서도 사이드바가 비지 않게 채워줌
+        subMenu.innerHTML = `<a href="index.html" class="active">최신글 목록</a>`;
       }
 
+      if (category) posts = posts.filter(p => p.category === category);
       if (sub) posts = posts.filter(p => p.sub === sub);
 
       posts.sort((a, b) => new Date(b.date) - new Date(a.date));
-
       list.innerHTML = "";
 
       posts.forEach(p => {
@@ -79,24 +86,14 @@ document.addEventListener("DOMContentLoaded", () => {
           <p>${p.excerpt || "내용 보기"}</p>
         `;
 
-        // ✅ 여기가 수정된 핵심 포인트입니다!
         item.onclick = () => {
-          let from = "home";
-          if (category === "diary") {
-            from = sub ? `diary-${sub}` : "diary-all";
-          }
-
-          // file 항목이 있으면 그걸 쓰고, 없으면 date를 씁니다.
+          let from = category === "diary" ? (sub ? `diary-${sub}` : "diary-all") : "home";
           let fileName = p.file || p.date;
-          if (!fileName.endsWith('.json')) {
+          if (!fileName.toString().endsWith('.json')) {
             fileName += '.json';
           }
-
-          // 이제 viewer.html로 "정확한 파일 이름"을 보냅니다.
-          location.href =
-            `viewer.html?post=posts/${fileName}&from=${encodeURIComponent(from)}`;
+          location.href = `viewer.html?post=posts/${fileName}&from=${encodeURIComponent(from)}`;
         };
-
         list.appendChild(item);
       });
     })
