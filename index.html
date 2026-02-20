@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>My Archive</title>
   <link rel="stylesheet" href="style.css"/>
-
   <script>
     if (!sessionStorage.getItem("auth")) {
       location.href = "login.html";
@@ -17,19 +16,22 @@
 <nav class="topbar">
   <div class="top-inner">
     <div class="logo">📦 My Archive</div>
-
     <div class="top-links">
       <a href="index.html">Home</a>
       <a href="index.html?cat=diary">Diary</a>
       <a href="index.html?cat=photos">Photos</a>
     </div>
-
     <button class="menu-btn" id="menuBtn">☰</button>
   </div>
 </nav>
 
 <div class="layout">
   <aside class="sidebar" id="sidebar">
+    <div class="mobile-main-menu" style="margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+      <a href="index.html" style="font-weight: bold; color: #fff;">🏠 Home</a>
+      <a href="index.html?cat=diary" style="font-weight: bold; color: #fff;">📝 Diary</a>
+      <a href="index.html?cat=photos" style="font-weight: bold; color: #fff;">📸 Photos</a>
+    </div>
     <div id="sub-menu"></div>
   </aside>
 
@@ -41,18 +43,25 @@
 <script src="script.js"></script>
 
 <script>
-  window.onload = function() {
-    const btn = document.getElementById("menuBtn");
-    const side = document.getElementById("sidebar");
+  // 메뉴 토글 기능
+  const menuBtn = document.getElementById("menuBtn");
+  const sidebar = document.getElementById("sidebar");
 
-    if (btn && side) {
-      btn.onclick = function() {
-        // 메뉴가 닫혀있으면 열고, 열려있으면 닫습니다.
-        side.classList.toggle("open");
-      };
-    }
-  };
+  if (menuBtn && sidebar) {
+    menuBtn.onclick = () => {
+      sidebar.classList.toggle("open");
+    };
+  }
 </script>
+
+<style>
+  /* PC에서는 모바일 전용 메뉴 숨기기 */
+  @media (min-width: 769px) {
+    .mobile-main-menu {
+      display: none !important;
+    }
+  }
+</style>
 
 </body>
 </html>
