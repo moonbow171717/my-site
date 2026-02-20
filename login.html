@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Login - My Archive</title>
+<style>
+body{
+  margin:0;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:#111;
+  font-family:sans-serif;
+  color:#fff;
+}
+.box{
+  background:#1e1e1e;
+  padding:40px;
+  border-radius:12px;
+  text-align:center;
+  width:300px;
+}
+input{
+  width:100%;
+  padding:10px;
+  margin-top:15px;
+  border:none;
+  border-radius:6px;
+}
+button{
+  width:100%;
+  padding:10px;
+  margin-top:15px;
+  border:none;
+  border-radius:6px;
+  background:#4a90e2;
+  color:#fff;
+  cursor:pointer;
+}
+button:hover{
+  opacity:0.9;
+}
+</style>
+</head>
+<body>
+
+<div class="box">
+  <h2>🔐 My Archive</h2>
+  <p>비밀번호를 입력하세요</p>
+  <input type="password" id="pw" placeholder="Password"/>
+  <button onclick="check()">입장</button>
+</div>
+
+<script>
+function check(){
+  const password = "1234"; // ← 여기 비밀번호 바꾸면 됨
+  const input = document.getElementById("pw").value;
+
+  if(input === password){
+    sessionStorage.setItem("auth","true");
+    window.location.href="index.html";
+  }else{
+    alert("비밀번호가 틀렸어요");
+  }
+}
+</script>
+
+</body>
+</html>

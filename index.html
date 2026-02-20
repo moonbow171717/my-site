@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>My Archive</title>
+  <link rel="stylesheet" href="style.css"/>
+
+  <script>
+    // 로그인 안 했으면 강제 이동
+    if (!sessionStorage.getItem("auth")) {
+      window.location.href = "login.html";
+    }
+  </script>
+</head>
+<body>
+
+<!-- 상단 네비 -->
+<nav class="topbar">
+  <div class="top-inner">
+    <div class="logo">📦 My Archive</div>
+
+    <div class="top-links">
+      <a href="index.html">Home</a>
+      <a href="index.html?cat=diary">Diary</a>
+      <a href="index.html?cat=photos">Photos</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+
+    <!-- 모바일 메뉴 버튼 -->
+    <button class="menu-btn" id="menuBtn">☰</button>
+  </div>
+</nav>
+
+<!-- 전체 레이아웃 -->
+<div class="layout">
+
+  <!-- 사이드바 -->
+  <aside class="sidebar" id="sidebar">
+    <div id="sub-menu"></div>
+  </aside>
+
+  <!-- 콘텐츠 -->
+  <main class="content">
+    <div id="post-list"></div>
+  </main>
+
+</div>
+
+<script>
+  function logout(){
+    sessionStorage.removeItem("auth");
+    window.location.href="login.html";
+  }
+
+  // 현재 카테고리 기억 (뒤로가기용)
+  const urlParams = new URLSearchParams(window.location.search);
+  const currentCat = urlParams.get('cat') || 'home';
+  sessionStorage.setItem("currentCategory", currentCat);
+</script>
+
+<script src="script.js?v=3"></script>
+</body>
+</html>
