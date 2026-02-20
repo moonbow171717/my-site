@@ -58,6 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
+  // ✅ 핵심 수정: postUrl(주소창에 찍힌 posts/파일명.json)을 그대로 불러옵니다.
   fetch(postUrl)
     .then(res => {
       if (!res.ok) throw new Error("파일 없음");
