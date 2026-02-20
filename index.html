@@ -6,7 +6,6 @@
     <title>My Archive</title>
     <link rel="stylesheet" href="style.css">
     <script>
-        // 로그인 체크
         if (!sessionStorage.getItem('auth')) {
             location.href = 'login.html';
         }
@@ -47,13 +46,13 @@
             const category = params.get('cat');
             const sub = params.get('sub');
 
-            fetch('posts/index.json')
+            // 캐시 방지를 위해 v=Date.now()를 추가했습니다.
+            fetch('posts/index.json?v=' + Date.now())
                 .then(res => res.json())
                 .then(posts => {
                     let filtered = posts;
                     if (category) filtered = filtered.filter(p => p.category === category);
 
-                    // 사이드바 카테고리 생성 (Diary 전용)
                     if (category === 'diary') {
                         const subs = [...new Set(posts.filter(p => p.category === 'diary' && p.sub).map(p => p.sub))];
                         if (subs.length > 0) {
@@ -79,7 +78,14 @@
                         `;
                         item.onclick = () => {
                             const from = category === 'diary' ? (sub ? `diary-${sub}` : 'diary-all') : 'home';
-                            location.href = `viewer.html?post=posts/${p.file}&from=${from}`;
+                            
+                            // 파일명 처리를 가장 유연하게 수정했습니다.
+                            let fileName = p.file;
+                            if (!fileName.includes('.')) {
+                                fileName += '.json';
+                            }
+                            
+                            location.href = `viewer.html?post=posts/${fileName}&from=${from}`;
                         };
                         list.appendChild(item);
                     });
