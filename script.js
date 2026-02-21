@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const parentParam = params.get("parent");
   const subParam = params.get("sub");
 
-  // 사이드바 메뉴 구성
+  // 1. 사이드바 메뉴 생성 (사용자님 원본 디자인 유지)
   if (category === "diary") {
     const menuStructure = [
       { name: "글", subs: ["일상", "카페"] },
@@ -36,37 +36,41 @@ document.addEventListener("DOMContentLoaded", () => {
     subMenu.innerHTML = `<a href="index.html" class="menu-parent">최신글 목록</a>`;
   }
 
-  // 글 목록 로딩
+  // 2. 글 목록 로딩 로직 (필터링 조건 수정)
   fetch("posts/index.json?v=" + new Date().getTime())
     .then(r => r.json())
     .then(data => {
       let posts = data.filter(p => p && p.title && p.date);
-      
-      // 1순위: 카테고리 필터링
+
+      // 카테고리(diary, photos 등)가 있으면 먼저 거릅니다.
       if (category) {
         posts = posts.filter(p => p.category === category);
       }
-      
-      // 2순위: 다이어리일 경우에만 세부 필터링 진행 (사진 목록 사라짐 방지)
-      if (category === "diary") {
-        if (subParam) {
-          posts = posts.filter(p => p.sub === subParam);
-        } else if (parentParam) {
-          posts = posts.filter(p => p.parent === parentParam);
-        }
+
+      // [중요] subParam이나 parentParam이 있을 때만 추가로 거릅니다.
+      // 이렇게 해야 파라미터가 없는 'photos' 목록이 안 지워집니다.
+      if (subParam) {
+        posts = posts.filter(p => p.sub === subParam);
+      } else if (parentParam) {
+        posts = posts.filter(p => p.parent === parentParam);
       }
 
       posts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-      // 현재 검색 상태 저장 (뒤로가기용)
-      const currentSearch = location.search || "index.html";
+      if (posts.length === 0) {
+        list.innerHTML = "<div style='color:#8b90a0; text-align:center; padding:50px;'>게시물이 없습니다.</div>";
+        return;
+      }
 
       list.innerHTML = posts.map(p => `
-        <div class="post-item" onclick="location.href='viewer.html?post=posts/${p.file || p.date}.json&from=${encodeURIComponent(currentSearch)}'">
+        <div class="post-item" onclick="location.href='viewer.html?post=posts/${p.file || p.date}.json&from=${encodeURIComponent(location.search || 'index.html')}'">
           <h3>${p.title}</h3>
           <span class="date">${p.date}</span>
           <p>${p.excerpt || "내용 보기"}</p>
         </div>
       `).join("");
+    })
+    .catch(err => {
+      list.innerHTML = "<div style='color:red; text-align:center;'>데이터 로딩 실패</div>";
     });
 });
