@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let backText = "← 돌아가기";
   
   if (fromPath.includes("cat=photos")) {
-    backText = "← Photos 목록으로 돌아가기";
+    backText = "← Photos로 돌아가기"; // 요청하신 대로 '목록으로'를 뺐습니다!
   } else if (fromPath.includes("sub=")) {
     const subName = decodeURIComponent(fromPath.split("sub=")[1].split("&")[0]);
     backText = `← ${subName}로 돌아가기`;
