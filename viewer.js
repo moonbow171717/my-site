@@ -29,14 +29,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (img) {
     sidebar.innerHTML = `<a href="${fromPath}" class="active">${backText}</a>`;
     container.innerHTML = `<div class="post-view"><div class="img-wrap"><img src="${img}" class="zoomable"></div><div style="margin-top:20px;"><a class="back-btn" href="${fromPath}">${backText}</a></div></div><div id="imgModal" class="img-modal"><img id="modalImg"></div>`;
-    
-    const modal = document.getElementById("imgModal");
-    const modalImg = document.getElementById("modalImg");
-    document.querySelector(".zoomable").onclick = e => {
-      modal.style.display = "flex";
-      modalImg.src = e.target.src;
-    };
-    modal.onclick = () => modal.style.display = "none";
     return;
   }
 
@@ -69,24 +61,19 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch("posts/index.json?v=" + Date.now())
           .then(res => res.json())
           .then(allPosts => {
-            // 💡 [개선] 주소창의 모든 정보를 훑어서 메뉴 이름을 찾아냅니다.
-            let currentPathInfo = decodeURIComponent(fromPath).toLowerCase().replace(/\s/g, "");
-            
-            // 현재 글의 sub 값
-            const currentSub = (p.sub || "").trim();
+            // 💡 [핵심 변경] 개별 파일의 데이터가 아니라, 
+            // 현재 사용자가 들어온 'from' 경로에 있는 'sub' 이름을 기준으로 삼습니다.
+            let currentSubFromUrl = "";
+            if (fromPath.includes("sub=")) {
+              currentSubFromUrl = decodeURIComponent(fromPath.split("sub=")[1].split("&")[0]).replace(/\s/g, "").toLowerCase();
+            }
 
-            // 목록 필터링
+            // 목록 파일에서 현재 카테고리에 속한 글들을 찾습니다.
             const seriesPosts = allPosts
               .filter(item => {
-                // 1. '전체 기록'이나 '최신글' 등으로 들어왔을 때 (Diary 전체)
-                if (currentPathInfo.includes("cat=diary") || currentPathInfo.includes("index.html")) {
-                  return true; 
-                }
-                // 2. 특정 소분류(sub)로 들어왔을 때
-                if (item.sub && currentSub) {
-                  return item.sub.trim() === currentSub;
-                }
-                return false;
+                if (!item.sub) return false;
+                const itemSubClean = item.sub.replace(/\s/g, "").toLowerCase();
+                return itemSubClean.includes(currentSubFromUrl) || currentSubFromUrl.includes(itemSubClean);
               })
               .sort((a, b) => new Date(a.date) - new Date(b.date));
 
@@ -96,10 +83,10 @@ document.addEventListener("DOMContentLoaded", () => {
             if (currentIndex !== -1 && seriesPosts.length > 1) {
               
               // 💡 '글'로 표시할 단어 리스트
-              const postUnits = ["일상", "카페", "nr", "nj", "잡담", "기록", "diary", "index", "목록"]; 
+              const postUnits = ["일상", "카페", "nr", "nj", "잡담", "기록"]; 
               
-              // 주소창 경로에 위 단어가 하나라도 있으면 '글', 아니면 '화'
-              const isPostUnit = postUnits.some(u => currentPathInfo.includes(u));
+              // 현재 주소창에 찍힌 메뉴 이름에 위 단어가 들어있으면 '글', 아니면 '화'
+              const isPostUnit = postUnits.some(u => currentSubFromUrl.includes(u));
               const unit = isPostUnit ? "글" : "화";
               
               let navHtml = "";
@@ -122,6 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
           });
 
+        // ... 이미지 모달 로직 생략 ...
         const modal = document.getElementById("imgModal");
         const modalImg = document.getElementById("modalImg");
         document.querySelectorAll(".zoomable").forEach(imgEl => {
