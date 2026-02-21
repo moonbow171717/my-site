@@ -29,13 +29,16 @@ document.addEventListener("DOMContentLoaded", () => {
     backText = "← Home으로 돌아가기";
   }
 
-  // 사이드바 뒤로가기 링크 설정
-  sidebar.innerHTML = `<a href="${fromPath}" class="active">${backText}</a>`;
+  // [수정] 사이드바에는 텍스트만 넣거나 비워둡니다 (중복 방지)
+  sidebar.innerHTML = `<div style="padding:10px; color:#fff; font-weight:bold;">VIEWING</div>`;
 
-  // 공통 버튼 HTML (줄바꿈 방지 스타일 포함)
-  const backBtnHtml = `<div style="margin: 10px 0 25px; text-align: left;">
-    <a class="back-btn" href="${fromPath}" style="white-space: nowrap; display: inline-block;">${backText}</a>
-  </div>`;
+  // [수정] 본문용 버튼 HTML (인라인 스타일로 줄바꿈 절대 방지)
+  const backBtnHtml = `
+    <div style="margin-bottom: 30px; display: block; clear: both;">
+      <a class="back-btn" href="${fromPath}" style="white-space: nowrap !important; display: inline-flex !important; align-items: center;">
+        ${backText}
+      </a>
+    </div>`;
 
   // 사진 전용 뷰 모드
   if (img) {
@@ -74,12 +77,11 @@ document.addEventListener("DOMContentLoaded", () => {
           <article class="post-view">
             <h1 class="post-title">${p.title}</h1>
             <div class="meta">${p.date}</div>
-            ${backBtnHtml}
+            <div style="margin-top:20px;">
+              ${backBtnHtml}
+            </div>
             ${images}
             <div class="post-content">${content}</div>
-            <div style="margin-top:50px;">
-              <a class="back-btn" href="${fromPath}" style="white-space: nowrap; display: inline-block;">${backText}</a>
-            </div>
           </article>
           <div id="imgModal" class="img-modal"><img id="modalImg"></div>`;
 
