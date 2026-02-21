@@ -7,7 +7,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const q = new URLSearchParams(location.search);
   const postUrl = q.get("post");
   const img = q.get("img");
-  const fromPath = q.get("from") || "index.html"; // 기본값은 홈
+  
+  // [중요 수정] 경로가 ?로 시작하면 index.html을 붙여서 "잘못된 접근" 방지
+  let rawPath = q.get("from") || "index.html";
+  const fromPath = rawPath.startsWith("?") ? "index.html" + rawPath : rawPath;
 
   const container = document.getElementById("post");
   const sidebar = document.getElementById("sidebar");
