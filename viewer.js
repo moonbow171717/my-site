@@ -8,16 +8,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const postUrl = q.get("post");
   const img = q.get("img");
   
-  // 뒤로가기 경로 보정 (잘못된 접근 방지)
+  // 뒤로가기 경로 보정 (파라미터만 있을 경우 index.html 붙여줌)
   let rawPath = q.get("from") || "index.html";
   const fromPath = rawPath.startsWith("?") ? "index.html" + rawPath : rawPath;
 
   const container = document.getElementById("post");
   const sidebar = document.getElementById("sidebar");
 
-  // 뒤로가기 버튼 텍스트 설정
+  // [수정] 뒤로가기 버튼 텍스트 설정 로직 최적화
   let backText = "← 돌아가기";
-  if (fromPath.includes("sub=")) {
+  
+  if (fromPath.includes("cat=photos")) {
+    backText = "← Photos 목록으로 돌아가기";
+  } else if (fromPath.includes("sub=")) {
     const subName = decodeURIComponent(fromPath.split("sub=")[1].split("&")[0]);
     backText = `← ${subName}로 돌아가기`;
   } else if (fromPath.includes("parent=")) {
@@ -25,8 +28,6 @@ document.addEventListener("DOMContentLoaded", () => {
     backText = `← ${parentName}로 돌아가기`;
   } else if (fromPath.includes("cat=diary")) {
     backText = "← Diary 전체로 돌아가기";
-  } else if (fromPath.includes("cat=photos")) {
-    backText = "← Photos로 돌아가기";
   } else {
     backText = "← Home으로 돌아가기";
   }
@@ -37,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
     container.innerHTML = `
       <div class="post-view">
         <div class="img-wrap"><img src="${img}" class="zoomable"></div>
-        <a class="back-btn" href="${fromPath}">${backText}</a>
+        <div style="margin-top:20px;"><a class="back-btn" href="${fromPath}">${backText}</a></div>
       </div>
       <div id="imgModal" class="img-modal"><img id="modalImg"></div>`;
     
@@ -72,7 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="meta">${p.date}</div>
             ${images}
             <div class="post-content">${content}</div>
-            <a class="back-btn" href="${fromPath}">${backText}</a>
+            <div style="margin-top:40px;"><a class="back-btn" href="${fromPath}">${backText}</a></div>
           </article>
           <div id="imgModal" class="img-modal"><img id="modalImg"></div>`;
 
@@ -86,5 +87,3 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .catch(() => { container.innerHTML = "글을 불러오지 못했습니다."; });
 });
-
-
