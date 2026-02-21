@@ -3,10 +3,6 @@
   "date": "1900-01-03",
   "category": "diary",
   "sub": "러브 콤플렉스",
-  "layout": "grid", 
-  "images": [
-    "photos/1.jpg",
-    "photos/2.jpg"
-  ],
   "text": "posts/1900-01-03.txt"
 }
+
