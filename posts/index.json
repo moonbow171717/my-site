@@ -329,6 +329,27 @@
     "parent": "냐쥬",
     "sub": "순애보증수표"
   },
+  {
+    "title": "대타위기사랑 1",
+    "date": "1901-01-25",
+    "category": "diary",
+    "parent": "냐쥬",
+    "sub": "대타위기사랑"
+  },
+  {
+    "title": "대타위기사랑 2",
+    "date": "1901-01-26",
+    "category": "diary",
+    "parent": "냐쥬",
+    "sub": "대타위기사랑"
+  },
+  {
+    "title": "하나, 둘",
+    "date": "1901-01-27",
+    "category": "diary",
+    "parent": "냐쥬",
+    "sub": "NJ"
+  },
   
   {
     "title": "자동화 성공",
