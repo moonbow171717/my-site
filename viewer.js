@@ -53,7 +53,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // 1. 현재 글 내용 가져오기
   fetch(postUrl)
     .then(res => res.json())
     .then(p => {
@@ -64,7 +63,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const content = txt.replace(/\n/g, "<br>");
         sidebar.innerHTML = `<a href="${fromPath}" class="active">${backText}</a>`;
         
-        // 게시글 기본 구조 삽입
         container.innerHTML = `
           <article class="post-view">
             <h1 class="post-title">${p.title}</h1>
@@ -76,14 +74,12 @@ document.addEventListener("DOMContentLoaded", () => {
           </article>
           <div id="imgModal" class="img-modal"><img id="modalImg"></div>`;
 
-        // 2. 시리즈 이동 버튼 로직 (index.json 참조)
         fetch("posts/index.json?v=" + Date.now())
           .then(res => res.json())
           .then(allPosts => {
-            // 현재 글과 같은 'sub'를 가진 글들만 필터링 (날짜순 정렬)
             const seriesPosts = allPosts
               .filter(item => item.sub === p.sub)
-              .sort((a, b) => new Date(a.date) - new Date(b.date)); // 1화부터 순서대로
+              .sort((a, b) => new Date(a.date) - new Date(b.date));
 
             const currentIndex = seriesPosts.findIndex(item => {
               const itemPath = `posts/${item.file || item.date}.json`;
@@ -92,22 +88,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const navContainer = document.getElementById("series-nav");
             if (currentIndex !== -1 && seriesPosts.length > 1) {
-              let navHtml = "";
+              // 💡 버튼 텍스트 자동 결정 (NR, 일상, 잡담 등은 '글' / 그 외 시리즈는 '화')
+              const subName = p.sub || "";
+              const isShortStory = subName.includes("NR") || subName.includes("일상") || subName.includes("잡담") || subName.includes("카페");
+              const unit = isShortStory ? "글" : "화";
               
-              // 이전 글 버튼 (현재가 1화가 아니면 생성)
+              let navHtml = "";
               if (currentIndex > 0) {
                 const prev = seriesPosts[currentIndex - 1];
                 const prevUrl = `viewer.html?post=posts/${prev.file || prev.date}.json&from=${encodeURIComponent(q.get("from"))}`;
-                navHtml += `<a href="${prevUrl}" class="back-btn" style="flex:1; text-align:center;">← 이전 화</a>`;
+                navHtml += `<a href="${prevUrl}" class="back-btn" style="flex:1; text-align:center;">← 이전 ${unit}</a>`;
               } else {
-                navHtml += `<div style="flex:1;"></div>`; // 여백 유지
+                navHtml += `<div style="flex:1;"></div>`;
               }
 
-              // 다음 글 버튼 (현재가 마지막 화가 아니면 생성)
               if (currentIndex < seriesPosts.length - 1) {
                 const next = seriesPosts[currentIndex + 1];
                 const nextUrl = `viewer.html?post=posts/${next.file || next.date}.json&from=${encodeURIComponent(q.get("from"))}`;
-                navHtml += `<a href="${nextUrl}" class="back-btn" style="flex:1; text-align:center;">다음 화 →</a>`;
+                navHtml += `<a href="${nextUrl}" class="back-btn" style="flex:1; text-align:center;">다음 ${unit} →</a>`;
               } else {
                 navHtml += `<div style="flex:1;"></div>`;
               }
