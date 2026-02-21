@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(location.search);
   const category = params.get("cat");
   const sub = params.get("sub");
-  const series = params.get("series"); // 3단계 파라미터 추가
+  const series = params.get("series");
 
   // =========================
   // 📸 Photos 로직
@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================
-  // 📝 Posts 로직 (3단계 대응 업데이트)
+  // 📝 Posts 로직 (3단계 순서 고정 업데이트)
   // =========================
   fetch("posts/index.json?v=" + new Date().getTime())
     .then(r => r.json())
@@ -50,26 +50,30 @@ document.addEventListener("DOMContentLoaded", () => {
       const validPosts = originalPosts.filter(p => p && p.title && p.date);
       let posts = [...validPosts];
 
-      // 사이드바 메뉴 구성
       if (category === "diary") {
-        // 2단계 메뉴(sub) 추출
-        const subs = [...new Set(validPosts.filter(p => p.category === "diary").map(p => p.sub))];
-        
-        let menuHtml = `<a href="index.html?cat=diary"${(!sub && !series) ? ' class="active"' : ''}>전체 기록</a>`;
+        // 사용자님이 원하신 고정 메뉴 순서
+        const myMenuOrder = ["전체 기록", "글", "냐람", "냐쥬", "♡", "끄적끄적", "일상"];
+        let menuHtml = "";
 
-        subs.forEach(s => {
-          const isActive = (sub === s);
-          menuHtml += `<a href="index.html?cat=diary&sub=${encodeURIComponent(s)}"${isActive ? ' class="active"' : ''}>${s}</a>`;
-          
-          // 3단계 로직: 만약 현재 메뉴가 '글'이거나, 사용자가 클릭한 sub라면 세부 시리즈(series) 노출
-          if (s === "글" && (sub === "글" || series)) {
-            const seriesList = [...new Set(validPosts.filter(p => p.sub === "글").map(p => p.series).filter(Boolean))];
-            
-            seriesList.forEach(ser => {
-              const isSerActive = (series === ser);
-              // 들여쓰기 디자인을 위해 스타일 추가
-              menuHtml += `<a href="index.html?cat=diary&sub=글&series=${encodeURIComponent(ser)}"${isSerActive ? ' class="active"' : ''} style="padding-left: 30px; font-size: 13px; opacity: 0.8;">└ ${ser}</a>`;
-            });
+        myMenuOrder.forEach(mName => {
+          if (mName === "전체 기록") {
+            menuHtml += `<a href="index.html?cat=diary"${(!sub && !series) ? ' class="active"' : ''}>전체 기록</a>`;
+          } else {
+            // 해당 메뉴(sub)에 글이 하나라도 있을 때만 메뉴 표시
+            const hasPost = validPosts.some(p => p.category === "diary" && p.sub === mName);
+            if (hasPost) {
+              const isActive = (sub === mName);
+              menuHtml += `<a href="index.html?cat=diary&sub=${encodeURIComponent(mName)}"${isActive ? ' class="active"' : ''}>${mName}</a>`;
+              
+              // 3단계 로직: "글" 메뉴일 때 하위 시리즈(series) 자동 노출
+              if (mName === "글") {
+                const seriesList = [...new Set(validPosts.filter(p => p.sub === "글").map(p => p.series).filter(Boolean))];
+                seriesList.forEach(ser => {
+                  const isSerActive = (series === ser);
+                  menuHtml += `<a href="index.html?cat=diary&sub=글&series=${encodeURIComponent(ser)}"${isSerActive ? ' class="active"' : ''} style="padding-left: 30px; font-size: 13px; opacity: 0.8; border-bottom: none;">└ ${ser}</a>`;
+                });
+              }
+            }
           }
         });
         subMenu.innerHTML = menuHtml;
@@ -80,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // 필터링 로직
       if (category) posts = posts.filter(p => p.category === category);
       if (sub) posts = posts.filter(p => p.sub === sub);
-      if (series) posts = posts.filter(p => p.series === series); // 3단계 필터 적용
+      if (series) posts = posts.filter(p => p.series === series);
 
       posts.sort((a, b) => new Date(b.date) - new Date(a.date));
       list.innerHTML = "";
@@ -95,7 +99,6 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
 
         item.onclick = () => {
-          // 정확한 복귀 주소 생성 (3단계까지 포함)
           let from = "home";
           if (category === "diary") {
             if (series) from = `diary-글-${series}`;
@@ -115,4 +118,3 @@ document.addEventListener("DOMContentLoaded", () => {
       list.innerHTML = "글을 불러오지 못했습니다.";
     });
 });
-
