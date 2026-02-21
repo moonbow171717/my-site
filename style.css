@@ -195,19 +195,24 @@ body {
   to { opacity: 1; }
 }
 
-/* ===== 뒤로가기 (수정됨) ===== */
+/* ===== 뒤로가기 (반투명 배경 버전) ===== */
 .back-btn {
-  display: inline-block;
-  margin-top: 50px;
-  font-size: 13px;
-  text-decoration: none;
-  color: #7a8090;
-  /* 아래 코드가 줄바꿈을 방지합니다! */
-  white-space: nowrap !important;
+  display: inline-block !important;
+  margin-top: 25px !important;
+  padding: 8px 15px !important;
+  background: rgba(255, 255, 255, 0.1) !important; /* 반투명 배경 살림 */
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  text-decoration: none !important;
+  color: #e6e6e6 !important;
+  white-space: nowrap !important; /* 줄바꿈 절대 방지 */
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  transition: 0.2s;
 }
 
 .back-btn:hover {
-  color: #fff;
+  background: rgba(255, 255, 255, 0.18) !important;
+  color: #fff !important;
 }
 
 /* ===== Pinterest Photo Grid ===== */
