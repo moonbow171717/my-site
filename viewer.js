@@ -15,11 +15,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const container = document.getElementById("post");
   const sidebar = document.getElementById("sidebar");
 
-  // [수정] 뒤로가기 버튼 텍스트 설정 로직 최적화 및 텍스트 단축
+  // [수정] 뒤로가기 버튼 텍스트 설정 로직 최적화
   let backText = "← 돌아가기";
   
   if (fromPath.includes("cat=photos")) {
-    backText = "← Photos로 돌아가기"; // '목록으로' 삭제하여 길이 최적화
+    backText = "← Photos 목록으로 돌아가기";
   } else if (fromPath.includes("sub=")) {
     const subName = decodeURIComponent(fromPath.split("sub=")[1].split("&")[0]);
     backText = `← ${subName}로 돌아가기`;
