@@ -65,19 +65,19 @@ body {
   gap: 40px;
 }
 
-/* ===== 사이드바 (수정됨) ===== */
+/* ===== 사이드바 (여백 수정됨) ===== */
 .sidebar {
   width: 180px;
   flex-shrink: 0;
 }
 
-/* 상위 메뉴 공통 */
+/* 상위 메뉴 공통 - 패딩을 조절하여 글자가 왼쪽으로 붙는 현상 해결 */
 .sidebar a, .menu-toggle {
   display: block;
   text-decoration: none;
   color: #8b90a0;
   font-size: 14px;
-  padding: 8px 12px;
+  padding: 10px 16px; /* 좌우 여백을 16px로 늘려 글자가 박스 안으로 들어오게 함 */
   border-radius: 8px;
   transition: 0.2s;
   cursor: pointer;
@@ -104,7 +104,7 @@ body {
 
 .sub-list a {
   font-size: 13px;
-  padding: 6px 12px;
+  padding: 8px 14px; /* 서브 메뉴도 동일하게 여백 확보 */
   margin-bottom: 2px;
 }
 
