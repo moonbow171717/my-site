@@ -20,9 +20,6 @@ document.addEventListener("DOMContentLoaded", () => {
   } else if (fromPath.includes("sub=")) {
     const subName = decodeURIComponent(fromPath.split("sub=")[1].split("&")[0]);
     backText = `← ${subName}로 돌아가기`;
-  } else if (fromPath.includes("parent=")) {
-    const parentName = decodeURIComponent(fromPath.split("parent=")[1].split("&")[0]);
-    backText = `← ${parentName}로 돌아가기`;
   } else if (fromPath.includes("cat=diary")) {
     backText = "← Diary 전체로 돌아가기";
   } else {
@@ -31,13 +28,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (img) {
     sidebar.innerHTML = `<a href="${fromPath}" class="active">${backText}</a>`;
-    container.innerHTML = `
-      <div class="post-view">
-        <div class="img-wrap"><img src="${img}" class="zoomable"></div>
-        <div style="margin-top:20px;"><a class="back-btn" href="${fromPath}">${backText}</a></div>
-      </div>
-      <div id="imgModal" class="img-modal"><img id="modalImg"></div>`;
-    // ... 이미지 관련 생략 ...
+    container.innerHTML = `<div class="post-view"><div class="img-wrap"><img src="${img}" class="zoomable"></div><div style="margin-top:20px;"><a class="back-btn" href="${fromPath}">${backText}</a></div></div><div id="imgModal" class="img-modal"><img id="modalImg"></div>`;
+    const modal = document.getElementById("imgModal");
+    const modalImg = document.getElementById("modalImg");
+    document.querySelector(".zoomable").onclick = e => { modal.style.display = "flex"; modalImg.src = e.target.src; };
+    modal.onclick = () => modal.style.display = "none";
     return;
   }
 
@@ -70,12 +65,17 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch("posts/index.json?v=" + Date.now())
           .then(res => res.json())
           .then(allPosts => {
-            // 현재 글의 sub 값을 가져와서 앞뒤 공백 제거
-            const currentSub = (p.sub || "").trim();
+            // [강화된 매칭 로직] 현재 글의 카테고리명을 정규화 (공백 제거 및 소문자화)
+            const currentSub = (p.sub || "").replace(/\s/g, "");
 
-            // 같은 sub를 가진 글들만 필터링 (날짜순)
+            // 같은 카테고리에 속한 글들을 더 유연하게 찾습니다.
             const seriesPosts = allPosts
-              .filter(item => item.sub && item.sub.trim() === currentSub)
+              .filter(item => {
+                if (!item.sub) return false;
+                const itemSub = item.sub.replace(/\s/g, "");
+                // 완벽히 일치하거나, 한쪽이 다른 쪽을 포함하고 있으면 같은 그룹으로 간주
+                return itemSub === currentSub || itemSub.includes(currentSub) || currentSub.includes(itemSub);
+              })
               .sort((a, b) => new Date(a.date) - new Date(b.date));
 
             const currentIndex = seriesPosts.findIndex(item => {
@@ -85,8 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const navContainer = document.getElementById("series-nav");
             if (currentIndex !== -1 && seriesPosts.length > 1) {
-              // 💡 '글'로 표시할 단편 메뉴 리스트 (여기에 없는 건 전부 '화'로 나옵니다)
-              const shortMenus = ["NR", "일상", "잡담", "카페", "끄적끄적"];
+              const shortMenus = ["NR", "일상", "잡담", "카페", "끄적", "♡"];
               const isShort = shortMenus.some(m => currentSub.includes(m));
               const unit = isShort ? "글" : "화";
               
