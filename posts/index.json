@@ -55,7 +55,13 @@
     "parent": "냐람",
     "sub": "NR"
   },
-  
+    {
+    "title": "다른손잡이",
+    "date": "1900-01-06",
+    "category": "diary",
+    "parent": "냐람",
+    "sub": "NR"
+  },
   {
     "title": "자동화 성공",
     "date": "2026-02-25",
