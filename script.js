@@ -13,7 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const parentParam = params.get("parent");
   const subParam = params.get("sub");
 
-  // 📸 Photos 모드
   if (category === "photos") {
     subMenu.innerHTML = `<a href="index.html?cat=photos" class="active">모든 사진</a><a href="index.html">홈으로</a>`;
     list.className = "photo-grid";
@@ -35,16 +34,13 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // 📝 Posts 모드
   fetch("posts/index.json?v=" + new Date().getTime())
     .then(r => r.json())
     .then(originalPosts => {
       const validPosts = originalPosts.filter(p => p && p.title && p.date);
-      let posts = [...validPosts];
-
-      // [메뉴 생성 로직]
+      
+      // 1. 메뉴 생성 (기호 없이 깔끔하게)
       if (category === "diary") {
-        // 다이어리 클릭 시에만 세부 메뉴 노출
         const menuStructure = [
           { name: "글", subs: ["일상", "카페"] },
           { name: "냐람", subs: ["연애 포기 각서", "홈스윗홈"] },
@@ -53,39 +49,39 @@ document.addEventListener("DOMContentLoaded", () => {
         ];
 
         let menuHtml = `<a href="index.html?cat=diary"${!parentParam && !subParam ? ' class="active"' : ''}>전체 기록</a>`;
-        
         menuStructure.forEach(m => {
           const isParentActive = (parentParam === m.name && !subParam);
-          // # 기호 제거
-          menuHtml += `<div style="margin-top:12px;">
-            <a href="index.html?cat=diary&parent=${encodeURIComponent(m.name)}"${isParentActive ? ' class="active"' : ''} style="font-weight:bold; color:#fff; display:block; margin-bottom:5px;">${m.name}</a>`;
-          
+          menuHtml += `<div style="margin-top:10px;">
+            <a href="index.html?cat=diary&parent=${encodeURIComponent(m.name)}"${isParentActive ? ' class="active"' : ''} style="font-weight:bold; color:#aaa; display:block; margin-bottom:5px;">${m.name}</a>`;
           m.subs.forEach(s => {
             const isSubActive = (subParam === s);
-            // ㄴ 기호 제거 + 들여쓰기 유지
-            menuHtml += `<a href="index.html?cat=diary&parent=${encodeURIComponent(m.name)}&sub=${encodeURIComponent(s)}"${isSubActive ? ' class="active"' : ''} style="padding-left:15px; font-size:0.9em; display:block; margin-bottom:4px; color:#aaa;">${s}</a>`;
+            menuHtml += `<a href="index.html?cat=diary&parent=${encodeURIComponent(m.name)}&sub=${encodeURIComponent(s)}"${isSubActive ? ' class="active"' : ''} style="padding-left:15px; font-size:0.9em; display:block; margin-bottom:3px;">${s}</a>`;
           });
           menuHtml += `</div>`;
         });
         subMenu.innerHTML = menuHtml;
       } else {
-        // 홈 화면(cat 없음)일 때는 깔끔하게 최신글 목록만 표시
         subMenu.innerHTML = `<a href="index.html" class="active">최신글 목록</a>`;
       }
 
-      // [필터링 로직]
+      // 2. [수정 핵심] 필터링 로직 - 더 직관적으로 변경
+      let posts = [...validPosts];
+
+      // 카테고리(diary 등) 필터
       if (category) {
         posts = posts.filter(p => p.category === category);
       }
       
+      // 상세 필터
       if (subParam) {
-        posts = posts.filter(p => p.sub === subParam);
+        // 하위 메뉴를 눌렀을 때 (예: 홈스윗홈)
+        posts = posts.filter(p => String(p.sub).trim() === subParam.trim());
       } else if (parentParam) {
-        // 상위 메뉴(냐람 등) 클릭 시 해당 parent의 모든 글 표시
-        posts = posts.filter(p => p.parent === parentParam);
+        // 상위 메뉴를 눌렀을 때 (예: 냐람) -> parent가 일치하는 모든 글
+        posts = posts.filter(p => String(p.parent).trim() === parentParam.trim());
       }
 
-      // [리스트 출력]
+      // 3. 리스트 출력
       posts.sort((a, b) => new Date(b.date) - new Date(a.date));
       list.innerHTML = "";
 
@@ -98,16 +94,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const item = document.createElement("div");
         item.className = "post-item";
         item.innerHTML = `<h3>${p.title}</h3><span class="date">${p.date}</span><p>${p.excerpt || "내용 보기"}</p>`;
-
         item.onclick = () => {
           let fromPath = "index.html";
-          if (category === "diary") {
-            fromPath += `?cat=diary`;
-            if (parentParam) fromPath += `&parent=${encodeURIComponent(parentParam)}`;
-            if (subParam) fromPath += `&sub=${encodeURIComponent(subParam)}`;
-          } else if (category === "photos") {
-            fromPath += `?cat=photos`;
-          }
+          if (category) fromPath += `?cat=${category}`;
+          if (parentParam) fromPath += `&parent=${encodeURIComponent(parentParam)}`;
+          if (subParam) fromPath += `&sub=${encodeURIComponent(subParam)}`;
           let fileName = p.file || p.date;
           if (!fileName.toString().endsWith('.json')) fileName += '.json';
           location.href = `viewer.html?post=posts/${fileName}&from=${encodeURIComponent(fromPath)}`;
@@ -119,4 +110,4 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error(err);
       list.innerHTML = "글을 불러오는 중 오류가 발생했습니다.";
     });
-});
+});ㅊ
