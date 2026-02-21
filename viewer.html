@@ -11,7 +11,7 @@
     }
   </script>
   <style>
-    /* 로고 스타일을 index.html과 통일 */
+    /* 로고 스타일 */
     .logo {
       font-family: 'Pretendard', sans-serif;
       font-weight: 800; 
@@ -23,24 +23,12 @@
       text-transform: uppercase;
     }
 
-    /* 본문 텍스트가 화면 밖으로 나가는 버그 수정 */
+    /* 줄바꿈 버그 수정 완료 */
     #post {
       word-break: break-all;
       overflow-wrap: break-word;
       line-height: 1.8;
-    }
-
-    /* 제목 및 메타 정보 스타일 */
-    .post-title {
-      font-size: 24px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      color: #fff;
-    }
-    .post-date {
-      font-size: 13px;
-      color: #8b90a0;
-      margin-bottom: 30px;
+      color: #d1d5db;
     }
 
     /* 이미지 모서리 둥글게 */
@@ -48,23 +36,6 @@
       width: 100%;
       border-radius: 20px;
       margin: 15px 0;
-    }
-
-    /* 세련된 뒤로가기 버튼 */
-    .back-btn-container {
-      margin-top: 50px;
-      padding-top: 20px;
-      border-top: 1px solid #1f232c;
-    }
-    .back-btn {
-      display: inline-block;
-      color: #8b90a0;
-      text-decoration: none;
-      font-size: 14px;
-      transition: 0.2s;
-    }
-    .back-btn:hover {
-      color: #fff;
     }
   </style>
 </head>
@@ -74,13 +45,11 @@
 <nav class="topbar">
   <div class="top-inner">
     <div class="logo">MY ARCHIVE</div>
-
     <div class="top-links">
       <a href="index.html">HOME</a>
       <a href="index.html?cat=diary">DIARY</a>
       <a href="index.html?cat=photos">PHOTOS</a>
     </div>
-
     <button class="menu-btn" id="menuBtn">☰</button>
   </div>
 </nav>
@@ -91,16 +60,11 @@
   <main class="content">
     <div id="post">
       </div>
-    
-    <div class="back-btn-container">
-      <a href="javascript:history.back();" class="back-btn">← RETURN TO LIST</a>
-    </div>
   </main>
 </div>
 
 <script src="viewer.js?v=4"></script>
 <script>
-  // 메뉴 토글 기능
   document.getElementById("menuBtn").onclick = () => {
     document.getElementById("sidebar").classList.toggle("open");
   };
