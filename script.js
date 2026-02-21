@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
     subMenu.innerHTML = `<a href="index.html" class="menu-parent">최신글 목록</a>`;
   }
 
-  // 글 목록 로딩 (기존 스타일 그대로 유지)
+  // 글 목록 로딩
   fetch("posts/index.json?v=" + new Date().getTime())
     .then(r => r.json())
     .then(data => {
@@ -45,12 +45,17 @@ document.addEventListener("DOMContentLoaded", () => {
       else if (parentParam) posts = posts.filter(p => p.parent === parentParam);
 
       posts.sort((a, b) => new Date(b.date) - new Date(a.date));
-      list.innerHTML = posts.map(p => `
-        <div class="post-item" onclick="location.href='viewer.html?post=posts/${p.file || p.date}.json&from=${encodeURIComponent(location.search || 'index.html')}'">
-          <h3>${p.title}</h3>
-          <span class="date">${p.date}</span>
-          <p>${p.excerpt || "내용 보기"}</p>
-        </div>
-      `).join("");
+      
+      // [수정 포인트] location.search 전체를 안전하게 넘겨서 뒤로가기 시 복구되게 함
+      list.innerHTML = posts.map(p => {
+        const currentSearch = location.search || "?cat=all";
+        return `
+          <div class="post-item" onclick="location.href='viewer.html?post=posts/${p.file || p.date}.json&from=${encodeURIComponent(currentSearch)}'">
+            <h3>${p.title}</h3>
+            <span class="date">${p.date}</span>
+            <p>${p.excerpt || "내용 보기"}</p>
+          </div>
+        `;
+      }).join("");
     });
 });
