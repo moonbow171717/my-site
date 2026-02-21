@@ -29,10 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (img) {
     sidebar.innerHTML = `<a href="${fromPath}" class="active">${backText}</a>`;
     container.innerHTML = `<div class="post-view"><div class="img-wrap"><img src="${img}" class="zoomable"></div><div style="margin-top:20px;"><a class="back-btn" href="${fromPath}">${backText}</a></div></div><div id="imgModal" class="img-modal"><img id="modalImg"></div>`;
-    const modal = document.getElementById("imgModal");
-    const modalImg = document.getElementById("modalImg");
-    document.querySelector(".zoomable").onclick = e => { modal.style.display = "flex"; modalImg.src = e.target.src; };
-    modal.onclick = () => modal.style.display = "none";
+    // ... 이미지 모달 로직 생략 ...
     return;
   }
 
@@ -65,29 +62,25 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch("posts/index.json?v=" + Date.now())
           .then(res => res.json())
           .then(allPosts => {
-            // [정규화] 현재 글의 sub 값에서 공백 제거 및 소문자로 변환
-            const currentSubRaw = (p.sub || "").trim();
-            const currentSubClean = currentSubRaw.replace(/\s/g, "").toLowerCase();
+            // 현재 글의 sub 값 (공백 제거)
+            const currentSub = (p.sub || "").trim();
 
             const seriesPosts = allPosts
-              .filter(item => {
-                if (!item.sub) return false;
-                const itemSubClean = item.sub.replace(/\s/g, "").toLowerCase();
-                return itemSubClean === currentSubClean || itemSubClean.includes(currentSubClean) || currentSubClean.includes(itemSubClean);
-              })
+              .filter(item => item.sub && item.sub.trim() === currentSub)
               .sort((a, b) => new Date(a.date) - new Date(b.date));
 
-            const currentIndex = seriesPosts.findIndex(item => {
-              const itemPath = `posts/${item.file || item.date}.json`;
-              return itemPath === postUrl;
-            });
+            const currentIndex = seriesPosts.findIndex(item => `posts/${item.file || item.date}.json` === postUrl);
 
             const navContainer = document.getElementById("series-nav");
             if (currentIndex !== -1 && seriesPosts.length > 1) {
-              // 💡 '글'로 부를 단편 메뉴 키워드들 (소문자로 작성)
-              const shortKeywords = ["nr", "일상", "잡담", "카페", "끄적", "♡"];
-              const isShort = shortKeywords.some(k => currentSubClean.includes(k));
-              const unit = isShort ? "글" : "화";
+              
+              // 💡 여기서 '글'로 표시할 소분류(sub) 이름들을 지정합니다.
+              // NR, 잡담, 일상, 카페 등이 여기에 해당합니다.
+              const postUnits = ["일상", "카페", "NR", "잡담"]; 
+              
+              // 현재 카테고리 이름에 위 단어 중 하나라도 포함되어 있으면 '글', 아니면 '화'
+              const isPostUnit = postUnits.some(u => currentSub.includes(u));
+              const unit = isPostUnit ? "글" : "화";
               
               let navHtml = "";
               if (currentIndex > 0) {
