@@ -23,7 +23,7 @@
       text-transform: uppercase;
     }
 
-    /* 줄바꿈 버그 수정 완료 */
+    /* 본문 텍스트 스타일 및 줄바꿈 버그 수정 */
     #post {
       word-break: break-all;
       overflow-wrap: break-word;
@@ -31,10 +31,18 @@
       color: #d1d5db;
     }
 
-    /* 이미지 모서리 둥글게 */
+    /* 이미지 스타일 */
     .img-wrap img {
       width: 100%;
       border-radius: 20px;
+      margin: 15px 0;
+      display: block;
+    }
+
+    /* [추가] 가로 배치 그리드 스타일 */
+    .image-row {
+      display: grid;
+      gap: 10px;
       margin: 15px 0;
     }
   </style>
@@ -58,16 +66,67 @@
   <aside class="sidebar" id="sidebar"></aside>
 
   <main class="content">
-    <div id="post">
-      </div>
+    <div id="post-header" style="margin-bottom: 30px;">
+      <h1 id="post-title" style="font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 8px;"></h1>
+      <div id="post-meta" style="font-size: 13px; color: #8b90a0;"></div>
+    </div>
+
+    <div id="post"></div>
   </main>
 </div>
 
-<script src="viewer.js?v=4"></script>
 <script>
+  // 메뉴 토글
   document.getElementById("menuBtn").onclick = () => {
     document.getElementById("sidebar").classList.toggle("open");
   };
+
+  // 데이터 로드 및 렌더링
+  const params = new URLSearchParams(location.search);
+  const postFile = params.get("post");
+
+  if (postFile) {
+    fetch(postFile)
+      .then(res => res.json())
+      .then(p => {
+        document.title = p.title + " | MY ARCHIVE";
+        document.getElementById("post-title").innerText = p.title;
+        document.getElementById("post-meta").innerText = p.date;
+
+        let html = "";
+        if (p.content) {
+          p.content.forEach(item => {
+            if (item.type === "image") {
+              // 일반 한 장짜리 사진
+              html += `<div class="img-wrap"><img src="${item.value}" loading="lazy"></div>`;
+            } 
+            else if (item.type === "image-row") {
+              // [신규] 나란히 배치할 사진들
+              const count = item.value.length;
+              html += `<div class="image-row" style="grid-template-columns: repeat(${count}, 1fr);">`;
+              item.value.forEach(src => {
+                html += `<div class="img-wrap" style="margin: 0;"><img src="${src}" loading="lazy"></div>`;
+              });
+              html += `</div>`;
+            } 
+            else if (item.type === "text") {
+              // 텍스트 출력
+              html += `<p style="margin-bottom:20px;">${item.value.replace(/\n/g, '<br>')}</p>`;
+            }
+          });
+        }
+        
+        // 돌아가기 버튼 자동 추가
+        html += `<div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #1f232c;">
+                  <a href="javascript:history.back();" style="color: #8b90a0; text-decoration: none; font-size: 14px;">← RETURN TO LIST</a>
+                </div>`;
+        
+        document.getElementById("post").innerHTML = html;
+      })
+      .catch(err => {
+        document.getElementById("post").innerHTML = "<p>게시글을 불러오는 중 오류가 발생했습니다.</p>";
+      });
+  }
 </script>
 
 </body>
