@@ -65,16 +65,15 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch("posts/index.json?v=" + Date.now())
           .then(res => res.json())
           .then(allPosts => {
-            // [강화된 매칭 로직] 현재 글의 카테고리명을 정규화 (공백 제거 및 소문자화)
-            const currentSub = (p.sub || "").replace(/\s/g, "");
+            // [정규화] 현재 글의 sub 값에서 공백 제거 및 소문자로 변환
+            const currentSubRaw = (p.sub || "").trim();
+            const currentSubClean = currentSubRaw.replace(/\s/g, "").toLowerCase();
 
-            // 같은 카테고리에 속한 글들을 더 유연하게 찾습니다.
             const seriesPosts = allPosts
               .filter(item => {
                 if (!item.sub) return false;
-                const itemSub = item.sub.replace(/\s/g, "");
-                // 완벽히 일치하거나, 한쪽이 다른 쪽을 포함하고 있으면 같은 그룹으로 간주
-                return itemSub === currentSub || itemSub.includes(currentSub) || currentSub.includes(itemSub);
+                const itemSubClean = item.sub.replace(/\s/g, "").toLowerCase();
+                return itemSubClean === currentSubClean || itemSubClean.includes(currentSubClean) || currentSubClean.includes(itemSubClean);
               })
               .sort((a, b) => new Date(a.date) - new Date(b.date));
 
@@ -85,8 +84,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const navContainer = document.getElementById("series-nav");
             if (currentIndex !== -1 && seriesPosts.length > 1) {
-              const shortMenus = ["NR", "일상", "잡담", "카페", "끄적", "♡"];
-              const isShort = shortMenus.some(m => currentSub.includes(m));
+              // 💡 '글'로 부를 단편 메뉴 키워드들 (소문자로 작성)
+              const shortKeywords = ["nr", "일상", "잡담", "카페", "끄적", "♡"];
+              const isShort = shortKeywords.some(k => currentSubClean.includes(k));
               const unit = isShort ? "글" : "화";
               
               let navHtml = "";
