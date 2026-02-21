@@ -35,6 +35,21 @@
     "sub": "홈 스윗 홈"
   },
   {
+    "title": "러브 콤플렉스 上",
+    "date": "1900-01-03",
+    "category": "diary",
+    "parent": "냐람",
+    "sub": "러브 콤플렉스"
+  },
+  {
+    "title": "러브 콤플렉스 下",
+    "date": "1900-01-04",
+    "category": "diary",
+    "parent": "냐람",
+    "sub": "러브 콤플렉스"
+  },
+  
+  {
     "title": "자동화 성공",
     "date": "2026-02-25",
     "category": "diary",
