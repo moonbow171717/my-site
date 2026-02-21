@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (category === "diary") {
         const menuStructure = [
           { name: "글", subs: ["일상", "카페"] },
-          { name: "냐람", subs: ["연애 포기 각서", "홈 스윗 홈", "러브 콤플렉스", "이성애를노력한다는게말이되니"] },
+          { name: "냐람", subs: ["연애 포기 각서", "홈 스윗 홈", "러브 콤플렉스", "♥"] },
           { name: "냐쥬", subs: [] },
           { name: "끄적끄적", subs: ["잡담"] }
         ];
