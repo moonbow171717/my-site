@@ -52,14 +52,14 @@ document.addEventListener("DOMContentLoaded", () => {
         
         menuStructure.forEach(m => {
           const isParentActive = (parentParam === m.name && !subParam);
-          // # 제거
-          menuHtml += `<div style="margin-top:10px;">
-            <a href="index.html?cat=diary&parent=${encodeURIComponent(m.name)}"${isParentActive ? ' class="active"' : ''} style="font-weight:bold; color:#aaa; display:block; margin-bottom:5px;">${m.name}</a>`;
+          // [수정] # 제거 및 상위 메뉴 강조
+          menuHtml += `<div style="margin-top:12px;">
+            <a href="index.html?cat=diary&parent=${encodeURIComponent(m.name)}"${isParentActive ? ' class="active"' : ''} style="font-weight:bold; color:#fff; display:block; margin-bottom:5px;">${m.name}</a>`;
           
           m.subs.forEach(s => {
             const isSubActive = (subParam === s);
-            // ㄴ 제거
-            menuHtml += `<a href="index.html?cat=diary&parent=${encodeURIComponent(m.name)}&sub=${encodeURIComponent(s)}"${isSubActive ? ' class="active"' : ''} style="padding-left:15px; font-size:0.9em; display:block; margin-bottom:3px;">${s}</a>`;
+            // [수정] ㄴ 제거 및 들여쓰기(padding-left) 유지
+            menuHtml += `<a href="index.html?cat=diary&parent=${encodeURIComponent(m.name)}&sub=${encodeURIComponent(s)}"${isSubActive ? ' class="active"' : ''} style="padding-left:15px; font-size:0.95em; display:block; margin-bottom:4px; color:#aaa;">${s}</a>`;
           });
           menuHtml += `</div>`;
         });
