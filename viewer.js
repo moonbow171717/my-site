@@ -8,14 +8,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const postUrl = q.get("post");
   const img = q.get("img");
   
-  // 뒤로가기 경로 보정 (파라미터만 있을 경우 index.html 붙여줌)
+  // 뒤로가기 경로 보정
   let rawPath = q.get("from") || "index.html";
   const fromPath = rawPath.startsWith("?") ? "index.html" + rawPath : rawPath;
 
   const container = document.getElementById("post");
   const sidebar = document.getElementById("sidebar");
 
-  // [수정] 뒤로가기 버튼 텍스트 설정 로직 최적화
+  // 뒤로가기 버튼 텍스트 설정
   let backText = "← 돌아가기";
   
   if (fromPath.includes("cat=photos")) {
@@ -37,8 +37,10 @@ document.addEventListener("DOMContentLoaded", () => {
     sidebar.innerHTML = `<a href="${fromPath}" class="active">${backText}</a>`;
     container.innerHTML = `
       <div class="post-view">
+        <div style="margin-bottom: 25px; text-align: left;">
+          <a class="back-btn" href="${fromPath}">${backText}</a>
+        </div>
         <div class="img-wrap"><img src="${img}" class="zoomable"></div>
-        <div style="margin-top:20px;"><a class="back-btn" href="${fromPath}">${backText}</a></div>
       </div>
       <div id="imgModal" class="img-modal"><img id="modalImg"></div>`;
     
@@ -73,7 +75,9 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="meta">${p.date}</div>
             ${images}
             <div class="post-content">${content}</div>
-            <div style="margin-top:40px;"><a class="back-btn" href="${fromPath}">${backText}</a></div>
+            <div style="margin-top:50px; text-align: left;">
+              <a class="back-btn" href="${fromPath}">${backText}</a>
+            </div>
           </article>
           <div id="imgModal" class="img-modal"><img id="modalImg"></div>`;
 
