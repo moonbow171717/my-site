@@ -29,6 +29,14 @@ document.addEventListener("DOMContentLoaded", () => {
   if (img) {
     sidebar.innerHTML = `<a href="${fromPath}" class="active">${backText}</a>`;
     container.innerHTML = `<div class="post-view"><div class="img-wrap"><img src="${img}" class="zoomable"></div><div style="margin-top:20px;"><a class="back-btn" href="${fromPath}">${backText}</a></div></div><div id="imgModal" class="img-modal"><img id="modalImg"></div>`;
+    
+    const modal = document.getElementById("imgModal");
+    const modalImg = document.getElementById("modalImg");
+    document.querySelector(".zoomable").onclick = e => {
+      modal.style.display = "flex";
+      modalImg.src = e.target.src;
+    };
+    modal.onclick = () => modal.style.display = "none";
     return;
   }
 
@@ -61,14 +69,17 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch("posts/index.json?v=" + Date.now())
           .then(res => res.json())
           .then(allPosts => {
-            // 💡 [핵심 변경] 개별 파일의 데이터가 아니라, 
-            // 현재 사용자가 들어온 'from' 경로에 있는 'sub' 이름을 기준으로 삼습니다.
-            let currentSubFromUrl = "";
-            if (fromPath.includes("sub=")) {
-              currentSubFromUrl = decodeURIComponent(fromPath.split("sub=")[1].split("&")[0]).replace(/\s/g, "").toLowerCase();
-            }
+            // 주소창에서 sub(소분류) 정보가 있는지 확인
+            const hasSub = fromPath.includes("sub=");
+            
+            // 💡 전체 기록(cat=diary)이나 홈(index.html)에서 온 경우엔 로직을 중단(버튼 안 만듦)
+            if (!hasSub) return;
 
-            // 목록 파일에서 현재 카테고리에 속한 글들을 찾습니다.
+            // sub 이름 추출 및 정규화
+            const currentSubFromUrl = decodeURIComponent(fromPath.split("sub=")[1].split("&")[0]).replace(/\s/g, "").toLowerCase();
+            const currentSub = (p.sub || "").trim();
+
+            // 같은 sub를 가진 글들만 필터링
             const seriesPosts = allPosts
               .filter(item => {
                 if (!item.sub) return false;
@@ -85,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
               // 💡 '글'로 표시할 단어 리스트
               const postUnits = ["일상", "카페", "nr", "nj", "잡담", "기록"]; 
               
-              // 현재 주소창에 찍힌 메뉴 이름에 위 단어가 들어있으면 '글', 아니면 '화'
+              // 현재 주소창 메뉴 이름에 위 단어가 들어있으면 '글', 아니면 '화'
               const isPostUnit = postUnits.some(u => currentSubFromUrl.includes(u));
               const unit = isPostUnit ? "글" : "화";
               
@@ -109,7 +120,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
           });
 
-        // ... 이미지 모달 로직 생략 ...
         const modal = document.getElementById("imgModal");
         const modalImg = document.getElementById("modalImg");
         document.querySelectorAll(".zoomable").forEach(imgEl => {
