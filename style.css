@@ -1,3 +1,4 @@
+
 /* ===== 기본 ===== */
 body {
   margin: 0;
@@ -40,7 +41,9 @@ body {
   transition: 0.2s;
 }
 
-.top-links a:hover { color: #fff; }
+.top-links a:hover {
+  color: #fff;
+}
 
 .menu-btn {
   display: none;
@@ -64,20 +67,34 @@ body {
 }
 
 /* ===== 사이드바 ===== */
-.sidebar { width: 180px; flex-shrink: 0; }
+.sidebar {
+  width: 180px;
+  flex-shrink: 0;
+}
 
-.sidebar a, .menu-toggle {
+.sidebar a {
   display: block;
   text-decoration: none;
   color: #8b90a0;
   font-size: 14px;
-  padding: 8px 12px;
-  border-radius: 8px;
+  margin-bottom: 12px;
   transition: 0.2s;
 }
 
+.sidebar a:hover {
+  color: #fff;
+}
+
+.sidebar a.active {
+  color: #fff;
+  font-weight: 500;
+}
+
 /* ===== 콘텐츠 ===== */
-.content { flex: 1; min-width: 0; }
+.content {
+  flex: 1;
+  min-width: 0;
+}
 
 /* ===== 카드 ===== */
 .post-item {
@@ -96,20 +113,63 @@ body {
   border-color: #2a3040;
 }
 
+.post-item h3 {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.post-item .date {
+  font-size: 12px;
+  color: #8b90a0;
+}
+
+.post-item p {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #b5bac7;
+}
+
 /* ===== 글 보기 ===== */
-.post-view { max-width: 720px; margin: auto; }
-.post-title { font-size: 26px; font-weight: 600; margin-bottom: 6px; }
-.meta { font-size: 12px; color: #8b90a0; }
-.post-content { margin-top: 30px; line-height: 1.9; color: #d6d9e0; font-size: 15.5px; }
+.post-view {
+  max-width: 720px;
+  margin: auto;
+}
+
+.post-title {
+  font-size: 26px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.meta {
+  font-size: 12px;
+  color: #8b90a0;
+}
+
+.post-content {
+  margin-top: 30px;
+  line-height: 1.9;
+  color: #d6d9e0;
+  font-size: 15.5px;
+}
 
 /* ===== 이미지 ===== */
-.img-wrap { margin: 34px 0; text-align: center; }
+.img-wrap {
+  margin: 34px 0;
+  text-align: center;
+}
+
 .img-wrap img {
   max-width: 100%;
   border-radius: 14px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
   cursor: zoom-in;
   transition: 0.25s;
+}
+
+.img-wrap img:hover {
+  transform: scale(1.02);
 }
 
 /* ===== 이미지 확대 모달 ===== */
@@ -121,41 +181,154 @@ body {
   align-items: center;
   justify-content: center;
   z-index: 999;
+  animation: fadeIn 0.2s ease;
 }
-.img-modal img { max-width: 90%; max-height: 90%; border-radius: 14px; }
 
-/* ===== [수정] 뒤로가기 버튼 최종 디자인 ===== */
+.img-modal img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ===== 뒤로가기 ===== */
 .back-btn {
-  display: inline-flex !important;
-  align-items: center;
-  padding: 10px 20px !important;
-  background-color: #232833 !important; /* 배경색을 명확히 함 */
-  color: #ffffff !important;
-  text-decoration: none !important;
-  border-radius: 10px !important;
-  font-size: 13px !important;
-  font-weight: 600 !important;
-  white-space: nowrap !important; /* 절대 줄바꿈 금지 */
-  border: 1px solid #3a3f4b !important;
-  transition: 0.2s;
-  width: fit-content !important; /* 텍스트 길이에 맞춤 */
+  display: inline-block;
+  margin-top: 50px;
+  font-size: 13px;
+  text-decoration: none;
+  color: #7a8090;
 }
 
 .back-btn:hover {
-  background-color: #2f3542 !important;
-  border-color: #4a505e !important;
+  color: #fff;
 }
 
 /* ===== Pinterest Photo Grid ===== */
-.photo-grid { column-count: 4; column-gap: 16px; max-width: 1100px; margin: 0 auto; }
-.photo-card { break-inside: avoid; margin-bottom: 16px; border-radius: 14px; overflow: hidden; }
-.photo-card img { width: 100%; display: block; transition: 0.3s; }
-
-/* ===== 반응형 ===== */
-@media (max-width: 768px) {
-  .layout { flex-direction: column; gap: 10px; margin: 20px auto; }
-  .sidebar { display: none; }
-  .sidebar.open { display: block !important; background: #171a21; padding: 20px; border-radius: 20px; }
-  .menu-btn { display: block !important; }
-  .top-links { display: none !important; }
+.photo-grid {
+  column-count: 4;
+  column-gap: 16px;
+  max-width: 1100px;
+  margin: 0 auto;
 }
+
+.photo-card {
+  break-inside: avoid;
+  margin-bottom: 16px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+}
+
+.photo-card img {
+  width: 100%;
+  display: block;
+  border-radius: 14px;
+  transition: 0.3s;
+}
+
+.photo-card:hover img {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
+/* ===== 반응형 (모바일 최적화 수정완료) ===== */
+
+@media (max-width: 1200px) {
+  .photo-grid { column-count: 3; }
+}
+
+@media (max-width: 800px) {
+  .photo-grid { column-count: 2; }
+}
+
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+    gap: 10px;
+    margin: 20px auto;
+  }
+
+  .sidebar {
+    display: none;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* 🎨 모바일 메뉴 상자 디자인 */
+  .sidebar.open {
+    display: block !important;
+    background: #171a21;
+    padding: 20px;
+    border-radius: 20px;
+    border: 1px solid #2a3040;
+    margin-bottom: 25px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+    animation: slideDown 0.3s ease-out;
+  }
+
+  /* 메인 버튼 가로 3칸 배치 */
+  .mobile-main-menu {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #2a3040;
+    padding-bottom: 15px;
+  }
+
+  .mobile-main-menu a {
+    background: #232833 !important;
+    padding: 12px 5px !important;
+    border-radius: 12px !important;
+    font-size: 13px !important;
+    text-align: center;
+    border: none !important;
+    margin-bottom: 0 !important;
+    color: #fff !important;
+    font-weight: 600;
+  }
+
+  /* 하위 카테고리(일상 등) 스타일 */
+  #sub-menu a {
+    padding: 12px 15px;
+    margin-bottom: 6px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 10px;
+    border: none;
+    color: #a0a5b5;
+    font-size: 14px;
+    display: block;
+  }
+
+  #sub-menu a.active {
+    background: #313846;
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .menu-btn {
+    display: block !important;
+  }
+
+  .top-links {
+    display: none !important;
+  }
+}
+
+@media (max-width: 500px) {
+  .photo-grid { column-count: 1; }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
