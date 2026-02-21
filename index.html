@@ -15,11 +15,11 @@
 
 <nav class="topbar">
   <div class="top-inner">
-    <div class="logo">📦 My Archive</div>
+    <div class="logo" style="letter-spacing: 1px;">MY ARCHIVE</div>
     <div class="top-links">
-      <a href="index.html">Home</a>
-      <a href="index.html?cat=diary">Diary</a>
-      <a href="index.html?cat=photos">Photos</a>
+      <a href="index.html">HOME</a>
+      <a href="index.html?cat=diary">DIARY</a>
+      <a href="index.html?cat=photos">PHOTOS</a>
     </div>
     <button class="menu-btn" id="menuBtn">☰</button>
   </div>
@@ -27,10 +27,10 @@
 
 <div class="layout">
   <aside class="sidebar" id="sidebar">
-    <div class="mobile-main-menu" style="margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
-      <a href="index.html" style="font-weight: bold; color: #fff;">🏠 Home</a>
-      <a href="index.html?cat=diary" style="font-weight: bold; color: #fff;">📝 Diary</a>
-      <a href="index.html?cat=photos" style="font-weight: bold; color: #fff;">📸 Photos</a>
+    <div class="mobile-main-menu">
+      <a href="index.html">HOME</a>
+      <a href="index.html?cat=diary">DIARY</a>
+      <a href="index.html?cat=photos">PHOTOS</a>
     </div>
     <div id="sub-menu"></div>
   </aside>
@@ -55,10 +55,25 @@
 </script>
 
 <style>
+  /* [추가] 로고 폰트 강조 */
+  .logo {
+    font-family: 'Pretendard', sans-serif;
+    font-weight: 700;
+    color: #fff;
+  }
+
   /* PC에서는 모바일 전용 메뉴 숨기기 */
   @media (min-width: 769px) {
     .mobile-main-menu {
       display: none !important;
+    }
+  }
+
+  /* 모바일 메인 메뉴 텍스트 정렬 보정 */
+  @media (max-width: 768px) {
+    .mobile-main-menu a {
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
   }
 </style>
