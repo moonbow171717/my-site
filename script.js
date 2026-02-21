@@ -13,7 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const parentParam = params.get("parent");
   const subParam = params.get("sub");
 
-  // 📸 Photos 모드
   if (category === "photos") {
     subMenu.innerHTML = `<a href="index.html?cat=photos" class="active">모든 사진</a><a href="index.html">홈으로</a>`;
     list.className = "photo-grid";
@@ -35,34 +34,30 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // 📝 Posts 모드
   fetch("posts/index.json?v=" + new Date().getTime())
     .then(r => r.json())
     .then(originalPosts => {
       const validPosts = originalPosts.filter(p => p && p.title && p.date);
-      
-      // 1. [자동 메뉴 생성] 데이터 기반으로 메뉴판 짜기
-      if (category === "diary") {
-        const diaryPosts = validPosts.filter(p => p.category === "diary");
-        const menuData = {}; // { "냐람": ["홈스윗홈", "연애 포기 각서"], "글": ["일상", "카페"] }
+      let posts = [...validPosts];
 
-        diaryPosts.forEach(p => {
-          const pName = p.parent || "미분류";
-          if (!menuData[pName]) menuData[pName] = new Set();
-          if (p.sub) menuData[pName].add(p.sub);
-        });
+      if (category === "diary") {
+        const menuStructure = [
+          { name: "글", subs: ["일상", "카페"] },
+          { name: "냐람", subs: ["연애 포기 각서", "홈스윗홈"] },
+          { name: "냐쥬", subs: [] },
+          { name: "끄적끄적", subs: ["잡담"] }
+        ];
 
         let menuHtml = `<a href="index.html?cat=diary"${!parentParam && !subParam ? ' class="active"' : ''}>전체 기록</a>`;
         
-        // 데이터에서 뽑아낸 parent들로 메뉴 만들기
-        Object.keys(menuData).forEach(pName => {
-          const isParentActive = (parentParam === pName && !subParam);
-          menuHtml += `<div style="margin-top:12px;">
-            <a href="index.html?cat=diary&parent=${encodeURIComponent(pName)}"${isParentActive ? ' class="active"' : ''} style="font-weight:bold; color:#fff; display:block; margin-bottom:5px;"># ${pName}</a>`;
+        menuStructure.forEach(m => {
+          const isParentActive = (parentParam === m.name && !subParam);
+          menuHtml += `<div style="margin-top:10px;">
+            <a href="index.html?cat=diary&parent=${encodeURIComponent(m.name)}"${isParentActive ? ' class="active"' : ''} style="font-weight:bold; color:#aaa; display:block; margin-bottom:5px;"># ${m.name}</a>`;
           
-          menuData[pName].forEach(sName => {
-            const isSubActive = (subParam === sName);
-            menuHtml += `<a href="index.html?cat=diary&parent=${encodeURIComponent(pName)}&sub=${encodeURIComponent(sName)}"${isSubActive ? ' class="active"' : ''} style="padding-left:15px; font-size:0.95em; display:block; margin-bottom:4px; color:#aaa;">ㄴ ${sName}</a>`;
+          m.subs.forEach(s => {
+            const isSubActive = (subParam === s);
+            menuHtml += `<a href="index.html?cat=diary&parent=${encodeURIComponent(m.name)}&sub=${encodeURIComponent(s)}"${isSubActive ? ' class="active"' : ''} style="padding-left:15px; font-size:0.9em; display:block; margin-bottom:3px;">ㄴ ${s}</a>`;
           });
           menuHtml += `</div>`;
         });
@@ -71,20 +66,50 @@ document.addEventListener("DOMContentLoaded", () => {
         subMenu.innerHTML = `<a href="index.html" class="active">최신글 목록</a>`;
       }
 
-      // 2. [필터링 로직] 글자만 같으면 무조건 보여주기
-      let posts = [...validPosts];
-      if (category) posts = posts.filter(p => p.category === category);
+      // 🔍 필터링 로직 (상위 메뉴 클릭 시 하위 항목 포함하도록 수정)
+      if (category) {
+        posts = posts.filter(p => p.category === category);
+      }
       
       if (subParam) {
-        // ㄴ 하위 메뉴 클릭 시: 해당 sub 글만
+        // 하위 메뉴(ㄴ 연애 포기 각서)를 누르면 해당 글만 보여줌
         posts = posts.filter(p => p.sub === subParam);
       } else if (parentParam) {
-        // # 상위 메뉴 클릭 시: 해당 parent 모든 글
+        // 상위 메뉴(# 냐람)를 누르면 해당 parent에 속한 모든 글을 보여줌
         posts = posts.filter(p => p.parent === parentParam);
       }
 
-      // 3. 리스트 출력
+      if (posts.length === 0) {
+        list.innerHTML = `<div style="padding:20px; color:#666;">해당 카테고리에 등록된 글이 없습니다.</div>`;
+        return;
+      }
+
       posts.sort((a, b) => new Date(b.date) - new Date(a.date));
       list.innerHTML = "";
 
-      if (posts.length ===
+      posts.forEach(p => {
+        const item = document.createElement("div");
+        item.className = "post-item";
+        item.innerHTML = `<h3>${p.title}</h3><span class="date">${p.date}</span><p>${p.excerpt || "내용 보기"}</p>`;
+
+        item.onclick = () => {
+          let fromPath = "index.html";
+          if (category === "diary") {
+            fromPath += `?cat=diary`;
+            if (parentParam) fromPath += `&parent=${encodeURIComponent(parentParam)}`;
+            if (subParam) fromPath += `&sub=${encodeURIComponent(subParam)}`;
+          } else if (category === "photos") {
+            fromPath += `?cat=photos`;
+          }
+          let fileName = p.file || p.date;
+          if (!fileName.toString().endsWith('.json')) fileName += '.json';
+          location.href = `viewer.html?post=posts/${fileName}&from=${encodeURIComponent(fromPath)}`;
+        };
+        list.appendChild(item);
+      });
+    })
+    .catch((err) => {
+      console.error(err);
+      list.innerHTML = "글을 불러오는 중 오류가 발생했습니다.";
+    });
+});
