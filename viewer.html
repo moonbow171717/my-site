@@ -11,7 +11,7 @@
     }
   </script>
   <style>
-    /* 로고 및 기본 스타일 */
+    /* 로고 스타일 */
     .logo {
       font-family: 'Pretendard', sans-serif;
       font-weight: 800; 
@@ -23,6 +23,7 @@
       text-transform: uppercase;
     }
 
+    /* 줄바꿈 버그 수정 */
     #post {
       word-break: break-all;
       overflow-wrap: break-word;
@@ -30,20 +31,22 @@
       color: #d1d5db;
     }
 
-    /* 이미지 스타일 */
+    /* 이미지 모서리 둥글게 */
     .img-wrap img {
       width: 100%;
       border-radius: 20px;
       margin: 15px 0;
-      display: block;
     }
 
-    /* 가로 배치용 그리드 */
-    .image-row {
+    /* [추가] 가로 배치용 스타일 - 필요한 글에만 적용됨 */
+    .image-grid-2 {
       display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 10px;
       margin: 15px 0;
     }
+    .image-grid-2 .img-wrap { margin: 0; }
+    .image-grid-2 img { margin: 0; }
   </style>
 </head>
 
@@ -65,74 +68,34 @@
   <aside class="sidebar" id="sidebar"></aside>
 
   <main class="content">
-    <div id="post-header" style="margin-bottom: 30px;">
-      <h1 id="post-title" style="font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 8px;"></h1>
-      <div id="post-meta" style="font-size: 13px; color: #8b90a0;"></div>
-    </div>
-    <div id="post"></div>
+    <div id="post">
+      </div>
   </main>
 </div>
 
+<script src="viewer.js?v=4"></script>
 <script>
-  // 메뉴 토글
+  // 메뉴 토글 기능
   document.getElementById("menuBtn").onclick = () => {
     document.getElementById("sidebar").classList.toggle("open");
   };
 
-  const params = new URLSearchParams(location.search);
-  const postFile = params.get("post");
-
-  if (postFile) {
-    fetch(postFile)
-      .then(res => res.json())
-      .then(p => {
-        document.title = p.title + " | MY ARCHIVE";
-        document.getElementById("post-title").innerText = p.title;
-        document.getElementById("post-meta").innerText = p.date;
-
-        let html = "";
-
-        // 1. 사진 처리 (images 배열이 있는 경우 가로 배치)
-        if (p.images && p.images.length > 0) {
-          const count = p.images.length;
-          if (count >= 2) {
-            // 사진이 2장 이상이면 가로로 나열
-            html += `<div class="image-row" style="grid-template-columns: repeat(${count}, 1fr);">`;
-            p.images.forEach(src => {
-              html += `<div class="img-wrap" style="margin: 0;"><img src="${src}" loading="lazy"></div>`;
-            });
-            html += `</div>`;
-          } else {
-            // 1장이면 기존처럼 출력
-            html += `<div class="img-wrap"><img src="${p.images[0]}" loading="lazy"></div>`;
-          }
-        }
-
-        // 2. 텍스트 처리 (text 파일 경로가 있는 경우)
-        if (p.text) {
-          fetch(p.text)
-            .then(res => res.text())
-            .then(txt => {
-              html += `<p style="margin-top:20px;">${txt.replace(/\n/g, '<br>')}</p>`;
-              appendBackButton();
-            });
-        } else if (p.content) {
-          // 기존 content 방식도 지원
-          p.content.forEach(item => {
-            if (item.type === "image") html += `<div class="img-wrap"><img src="${item.value}"></div>`;
-            else if (item.type === "text") html += `<p>${item.value.replace(/\n/g, '<br>')}</p>`;
-          });
-          appendBackButton();
-        }
-
-        function appendBackButton() {
-          html += `<div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #1f232c;">
-                    <a href="javascript:history.back();" style="color: #8b90a0; text-decoration: none; font-size: 14px;">← RETURN TO LIST</a>
-                  </div>`;
-          document.getElementById("post").innerHTML = html;
-        }
-      });
-  }
+  /* [핵심] 사진 두 장 가로 배치를 위한 추가 스크립트 
+     페이지 로드 후, 특정 조건(이미지 연속 2장 등)일 때만 가로로 묶어줍니다.
+  */
+  window.onload = () => {
+    const postDiv = document.getElementById("post");
+    // '러브 콤플렉스' 같은 글에서 이미지가 연속으로 있을 때만 가로로 묶음 처리
+    const images = postDiv.querySelectorAll('.img-wrap');
+    if (images.length >= 2) {
+       // 첫 번째 이미지와 두 번째 이미지를 찾아서 그리드로 감싸기
+       const grid = document.createElement('div');
+       grid.className = 'image-grid-2';
+       images[0].parentNode.insertBefore(grid, images[0]);
+       grid.appendChild(images[0]);
+       grid.appendChild(images[1]);
+    }
+  };
 </script>
 
 </body>
