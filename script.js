@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const parentParam = params.get("parent");
   const subParam = params.get("sub");
 
-  // 📸 Photos 로직
+  // 📸 Photos 모드
   if (category === "photos") {
     subMenu.innerHTML = `<a href="index.html?cat=photos" class="active">모든 사진</a><a href="index.html">홈으로</a>`;
     list.className = "photo-grid";
@@ -35,35 +35,34 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // 📝 Posts 로직
+  // 📝 Posts 모드
   fetch("posts/index.json?v=" + new Date().getTime())
     .then(r => r.json())
     .then(originalPosts => {
       const validPosts = originalPosts.filter(p => p && p.title && p.date);
       
-      // 1. [중요] 메뉴 자동 생성 (Diary일 때)
+      // 1. [자동 메뉴 생성] 데이터 기반으로 메뉴판 짜기
       if (category === "diary") {
         const diaryPosts = validPosts.filter(p => p.category === "diary");
-        const menuMap = new Map();
+        const menuData = {}; // { "냐람": ["홈스윗홈", "연애 포기 각서"], "글": ["일상", "카페"] }
 
-        // index.json을 훑어서 parent와 sub 관계를 정리합니다.
         diaryPosts.forEach(p => {
           const pName = p.parent || "미분류";
-          if (!menuMap.has(pName)) menuMap.set(pName, new Set());
-          if (p.sub) menuMap.get(pName).add(p.sub);
+          if (!menuData[pName]) menuData[pName] = new Set();
+          if (p.sub) menuData[pName].add(p.sub);
         });
 
         let menuHtml = `<a href="index.html?cat=diary"${!parentParam && !subParam ? ' class="active"' : ''}>전체 기록</a>`;
         
-        // 정리된 데이터를 바탕으로 메뉴를 그립니다.
-        menuMap.forEach((subs, pName) => {
+        // 데이터에서 뽑아낸 parent들로 메뉴 만들기
+        Object.keys(menuData).forEach(pName => {
           const isParentActive = (parentParam === pName && !subParam);
           menuHtml += `<div style="margin-top:12px;">
             <a href="index.html?cat=diary&parent=${encodeURIComponent(pName)}"${isParentActive ? ' class="active"' : ''} style="font-weight:bold; color:#fff; display:block; margin-bottom:5px;"># ${pName}</a>`;
           
-          subs.forEach(sName => {
+          menuData[pName].forEach(sName => {
             const isSubActive = (subParam === sName);
-            menuHtml += `<a href="index.html?cat=diary&parent=${encodeURIComponent(pName)}&sub=${encodeURIComponent(sName)}"${isSubActive ? ' class="active"' : ''} style="padding-left:15px; font-size:0.9em; display:block; margin-bottom:4px; color:#aaa;">ㄴ ${sName}</a>`;
+            menuHtml += `<a href="index.html?cat=diary&parent=${encodeURIComponent(pName)}&sub=${encodeURIComponent(sName)}"${isSubActive ? ' class="active"' : ''} style="padding-left:15px; font-size:0.95em; display:block; margin-bottom:4px; color:#aaa;">ㄴ ${sName}</a>`;
           });
           menuHtml += `</div>`;
         });
@@ -72,15 +71,15 @@ document.addEventListener("DOMContentLoaded", () => {
         subMenu.innerHTML = `<a href="index.html" class="active">최신글 목록</a>`;
       }
 
-      // 2. [중요] 필터링 로직 (상위 메뉴 클릭 시 하위 포함)
+      // 2. [필터링 로직] 글자만 같으면 무조건 보여주기
       let posts = [...validPosts];
       if (category) posts = posts.filter(p => p.category === category);
       
       if (subParam) {
-        // 하위 메뉴(ㄴ 일상) 클릭 시
+        // ㄴ 하위 메뉴 클릭 시: 해당 sub 글만
         posts = posts.filter(p => p.sub === subParam);
       } else if (parentParam) {
-        // 상위 메뉴(# 글) 클릭 시: 해당 parent인 것 다 보여줌
+        // # 상위 메뉴 클릭 시: 해당 parent 모든 글
         posts = posts.filter(p => p.parent === parentParam);
       }
 
@@ -88,27 +87,4 @@ document.addEventListener("DOMContentLoaded", () => {
       posts.sort((a, b) => new Date(b.date) - new Date(a.date));
       list.innerHTML = "";
 
-      if (posts.length === 0) {
-        list.innerHTML = `<div style="text-align:center; padding:100px 20px; color:#666;">해당 카테고리에 등록된 글이 없습니다.</div>`;
-        return;
-      }
-
-      posts.forEach(p => {
-        const item = document.createElement("div");
-        item.className = "post-item";
-        item.innerHTML = `<h3>${p.title}</h3><span class="date">${p.date}</span><p>${p.excerpt || "내용 보기"}</p>`;
-        item.onclick = () => {
-          let fromPath = `index.html?cat=${category || 'diary'}`;
-          if (parentParam) fromPath += `&parent=${encodeURIComponent(parentParam)}`;
-          if (subParam) fromPath += `&sub=${encodeURIComponent(subParam)}`;
-          let fileName = p.file || p.date;
-          if (!fileName.toString().endsWith('.json')) fileName += '.json';
-          location.href = `viewer.html?post=posts/${fileName}&from=${encodeURIComponent(fromPath)}`;
-        };
-        list.appendChild(item);
-      });
-    })
-    .catch(() => {
-      list.innerHTML = "글을 불러오지 못했습니다.";
-    });
-});
+      if (posts.length ===
