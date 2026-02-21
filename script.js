@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     return;
   }
+  
 
   fetch("posts/index.json?v=" + new Date().getTime())
     .then(r => r.json())
