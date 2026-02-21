@@ -38,27 +38,30 @@ document.addEventListener("DOMContentLoaded", () => {
     .then(r => r.json())
     .then(originalPosts => {
       const validPosts = originalPosts.filter(p => p && p.title && p.date);
-      let posts = [...validPosts];
-
-      // 1. 사이드바 메뉴 그리기
+      
+      // 1. 자동 메뉴 생성 로직 (Diary일 때)
       if (category === "diary") {
-        const menuStructure = [
-          { name: "글", subs: ["일상", "카페"] },
-          { name: "냐람", subs: ["연애 포기 각서", "홈스윗홈"] },
-          { name: "냐쥬", subs: [] },
-          { name: "끄적끄적", subs: ["잡담"] }
-        ];
+        const diaryPosts = validPosts.filter(p => p.category === "diary");
+        
+        // 데이터에서 parent와 sub 관계를 자동으로 추출합니다.
+        const menuData = {};
+        diaryPosts.forEach(p => {
+          const pName = p.parent || "기타";
+          if (!menuData[pName]) menuData[pName] = new Set();
+          if (p.sub) menuData[pName].add(p.sub);
+        });
 
         let menuHtml = `<a href="index.html?cat=diary"${!parentParam && !subParam ? ' class="active"' : ''}>전체 기록</a>`;
         
-        menuStructure.forEach(m => {
-          const isParentActive = (parentParam === m.name && !subParam);
+        // 추출된 데이터를 바탕으로 메뉴 HTML 생성
+        Object.keys(menuData).forEach(pName => {
+          const isParentActive = (parentParam === pName && !subParam);
           menuHtml += `<div style="margin-top:10px;">
-            <a href="index.html?cat=diary&parent=${encodeURIComponent(m.name)}"${isParentActive ? ' class="active"' : ''} style="font-weight:bold; color:#aaa; display:block; margin-bottom:5px;"># ${m.name}</a>`;
+            <a href="index.html?cat=diary&parent=${encodeURIComponent(pName)}"${isParentActive ? ' class="active"' : ''} style="font-weight:bold; color:#aaa; display:block; margin-bottom:5px;"># ${pName}</a>`;
           
-          m.subs.forEach(s => {
-            const isSubActive = (subParam === s);
-            menuHtml += `<a href="index.html?cat=diary&parent=${encodeURIComponent(m.name)}&sub=${encodeURIComponent(s)}"${isSubActive ? ' class="active"' : ''} style="padding-left:15px; font-size:0.9em; display:block; margin-bottom:3px;">ㄴ ${s}</a>`;
+          menuData[pName].forEach(sName => {
+            const isSubActive = (subParam === sName);
+            menuHtml += `<a href="index.html?cat=diary&parent=${encodeURIComponent(pName)}&sub=${encodeURIComponent(sName)}"${isSubActive ? ' class="active"' : ''} style="padding-left:15px; font-size:0.9em; display:block; margin-bottom:3px;">ㄴ ${sName}</a>`;
           });
           menuHtml += `</div>`;
         });
@@ -67,20 +70,17 @@ document.addEventListener("DOMContentLoaded", () => {
         subMenu.innerHTML = `<a href="index.html" class="active">최신글 목록</a>`;
       }
 
-      // 2. 필터링 로직 (여기가 핵심!)
-      if (category) {
-        posts = posts.filter(p => p.category === category);
-      }
+      // 2. 필터링 로직
+      let posts = [...validPosts];
+      if (category) posts = posts.filter(p => p.category === category);
       
       if (subParam) {
-        // ㄴ 하위메뉴 클릭 시: 해당 sub만 필터링
         posts = posts.filter(p => p.sub === subParam);
       } else if (parentParam) {
-        // # 상위메뉴 클릭 시: 해당 parent인 것 다 보여줌
         posts = posts.filter(p => p.parent === parentParam);
       }
 
-      // 3. 리스트 출력
+      // 3. 결과 출력
       posts.sort((a, b) => new Date(b.date) - new Date(a.date));
       list.innerHTML = "";
 
@@ -95,7 +95,6 @@ document.addEventListener("DOMContentLoaded", () => {
         item.innerHTML = `<h3>${p.title}</h3><span class="date">${p.date}</span><p>${p.excerpt || "내용 보기"}</p>`;
 
         item.onclick = () => {
-          // 되돌아올 주소 설정 (현재 클릭한 필터 상태 유지)
           let fromPath = `index.html?cat=${category || 'diary'}`;
           if (parentParam) fromPath += `&parent=${encodeURIComponent(parentParam)}`;
           if (subParam) fromPath += `&sub=${encodeURIComponent(subParam)}`;
