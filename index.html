@@ -11,6 +11,7 @@
     }
   </script>
   <style>
+    /* 로고: 폰트 두께를 키우고 은은한 그라데이션을 넣었습니다 */
     .logo {
       font-family: 'Pretendard', sans-serif;
       font-weight: 800; 
@@ -21,9 +22,15 @@
       display: inline-block;
       text-transform: uppercase;
     }
+
+    /* PC에서는 모바일 메뉴 숨기기 */
     @media (min-width: 769px) {
-      .mobile-main-menu { display: none !important; }
+      .mobile-main-menu {
+        display: none !important;
+      }
     }
+
+    /* 모바일 메뉴: 간격과 텍스트 스타일을 다듬었습니다 */
     @media (max-width: 768px) {
       .mobile-main-menu {
         display: grid !important;
@@ -34,16 +41,17 @@
         padding-bottom: 15px;
       }
       .mobile-main-menu a {
-        background: #232833;
-        padding: 10px 5px;
-        border-radius: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
         font-weight: 600;
         text-align: center;
         color: #fff !important;
         text-decoration: none;
-        font-size: 12px;
+        font-size: 13px;
       }
     }
+
+    /* 위로 가기 버튼 디자인 */
     #scrollTopBtn {
       position: fixed;
       bottom: 30px;
@@ -64,16 +72,21 @@
       justify-content: center;
       transition: background 0.3s;
     }
-    /* 아코디언 메뉴 스타일 */
-    .menu-group { margin-top: 15px; }
-    .menu-toggle { font-weight: bold; color: #fff; cursor: pointer; padding: 8px 12px; font-size: 14px; border-radius: 8px; }
-    .menu-toggle:hover { background: rgba(255,255,255,0.05); }
-    .sub-list { padding-left: 15px; border-left: 1px solid #2a3040; margin-left: 10px; margin-top: 5px; }
-    .sub-list a { font-size: 13px; color: #8b90a0 !important; padding: 6px 0; display: block; text-decoration: none; }
-    .sub-list a:hover, .sub-list a.active { color: #fff !important; }
+    #scrollTopBtn:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* [여기가 추가된 부분] 아코디언 메뉴 스타일 */
+    .menu-group { margin-bottom: 12px; }
+    .menu-parent { font-weight: bold; color: #fff; cursor: pointer; display: block; margin-bottom: 8px; font-size: 14px; }
+    .sub-menu-list { display: none; padding-left: 15px; border-left: 1px solid #2a3040; }
+    .sub-menu-list.active { display: block; }
+    .sub-menu-list a { font-size: 13px; color: #8b90a0 !important; margin-bottom: 8px; text-decoration: none; display: block; }
+    .sub-menu-list a:hover, .sub-menu-list a.active { color: #fff !important; }
   </style>
 </head>
 <body>
+
 <nav class="topbar">
   <div class="top-inner">
     <div class="logo">MY ARCHIVE</div>
@@ -85,7 +98,9 @@
     <button class="menu-btn" id="menuBtn">☰</button>
   </div>
 </nav>
+
 <button id="scrollTopBtn" title="Go to top">↑</button>
+
 <div class="layout">
   <aside class="sidebar" id="sidebar">
     <div class="mobile-main-menu">
@@ -95,18 +110,26 @@
     </div>
     <div id="sub-menu"></div> 
   </aside>
+
   <main class="content">
     <div id="post-list"></div>
   </main>
 </div>
-<script src="script.js?v=2"></script>
+
+<script src="script.js"></script>
+
 <script>
   const menuBtn = document.getElementById("menuBtn");
   const sidebar = document.getElementById("sidebar");
+
   if (menuBtn && sidebar) {
-    menuBtn.onclick = () => { sidebar.classList.toggle("open"); };
+    menuBtn.onclick = () => {
+      sidebar.classList.toggle("open");
+    };
   }
+
   const topBtn = document.getElementById("scrollTopBtn");
+
   window.onscroll = function() {
     if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
       topBtn.style.display = "flex";
@@ -114,9 +137,14 @@
       topBtn.style.display = "none";
     }
   };
+
   topBtn.onclick = function() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   };
 </script>
+
 </body>
 </html>
