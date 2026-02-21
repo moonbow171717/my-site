@@ -105,3 +105,4 @@ document.addEventListener("DOMContentLoaded", () => {
       list.innerHTML = "데이터 로딩 실패";
     });
 });
+
