@@ -33,7 +33,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     return;
   }
-  
 
   fetch("posts/index.json?v=" + new Date().getTime())
     .then(r => r.json())
@@ -41,6 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const validPosts = originalPosts.filter(p => p && p.title && p.date);
       let posts = [...validPosts];
 
+      // 1. 사이드바 메뉴 그리기
       if (category === "diary") {
         const menuStructure = [
           { name: "글", subs: ["일상", "카페"] },
@@ -67,26 +67,27 @@ document.addEventListener("DOMContentLoaded", () => {
         subMenu.innerHTML = `<a href="index.html" class="active">최신글 목록</a>`;
       }
 
-      // 🔍 필터링 로직 (상위 메뉴 클릭 시 하위 항목 포함하도록 수정)
+      // 2. 필터링 로직 (여기가 핵심!)
       if (category) {
         posts = posts.filter(p => p.category === category);
       }
       
       if (subParam) {
-        // 하위 메뉴(ㄴ 연애 포기 각서)를 누르면 해당 글만 보여줌
+        // ㄴ 하위메뉴 클릭 시: 해당 sub만 필터링
         posts = posts.filter(p => p.sub === subParam);
       } else if (parentParam) {
-        // 상위 메뉴(# 냐람)를 누르면 해당 parent에 속한 모든 글을 보여줌
+        // # 상위메뉴 클릭 시: 해당 parent인 것 다 보여줌
         posts = posts.filter(p => p.parent === parentParam);
       }
 
-      if (posts.length === 0) {
-        list.innerHTML = `<div style="padding:20px; color:#666;">해당 카테고리에 등록된 글이 없습니다.</div>`;
-        return;
-      }
-
+      // 3. 리스트 출력
       posts.sort((a, b) => new Date(b.date) - new Date(a.date));
       list.innerHTML = "";
+
+      if (posts.length === 0) {
+        list.innerHTML = `<div style="text-align:center; padding:50px; color:#666;">해당 카테고리에 등록된 글이 없습니다.</div>`;
+        return;
+      }
 
       posts.forEach(p => {
         const item = document.createElement("div");
@@ -94,14 +95,11 @@ document.addEventListener("DOMContentLoaded", () => {
         item.innerHTML = `<h3>${p.title}</h3><span class="date">${p.date}</span><p>${p.excerpt || "내용 보기"}</p>`;
 
         item.onclick = () => {
-          let fromPath = "index.html";
-          if (category === "diary") {
-            fromPath += `?cat=diary`;
-            if (parentParam) fromPath += `&parent=${encodeURIComponent(parentParam)}`;
-            if (subParam) fromPath += `&sub=${encodeURIComponent(subParam)}`;
-          } else if (category === "photos") {
-            fromPath += `?cat=photos`;
-          }
+          // 되돌아올 주소 설정 (현재 클릭한 필터 상태 유지)
+          let fromPath = `index.html?cat=${category || 'diary'}`;
+          if (parentParam) fromPath += `&parent=${encodeURIComponent(parentParam)}`;
+          if (subParam) fromPath += `&sub=${encodeURIComponent(subParam)}`;
+
           let fileName = p.file || p.date;
           if (!fileName.toString().endsWith('.json')) fileName += '.json';
           location.href = `viewer.html?post=posts/${fileName}&from=${encodeURIComponent(fromPath)}`;
