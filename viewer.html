@@ -11,7 +11,7 @@
     }
   </script>
   <style>
-    /* 로고 및 기본 스타일 유지 */
+    /* 로고 스타일 */
     .logo {
       font-family: 'Pretendard', sans-serif;
       font-weight: 800; 
@@ -23,6 +23,7 @@
       text-transform: uppercase;
     }
 
+    /* 줄바꿈 버그 수정 완료 */
     #post {
       word-break: break-all;
       overflow-wrap: break-word;
@@ -30,21 +31,12 @@
       color: #d1d5db;
     }
 
+    /* 이미지 모서리 둥글게 */
     .img-wrap img {
       width: 100%;
       border-radius: 20px;
       margin: 15px 0;
     }
-
-    /* [추가] JSON에서 layout: grid일 때만 작동하는 스타일 */
-    .photo-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin: 15px 0;
-    }
-    .photo-grid .img-wrap { margin: 0; }
-    .photo-grid img { margin: 0; }
   </style>
 </head>
 
@@ -64,6 +56,7 @@
 
 <div class="layout">
   <aside class="sidebar" id="sidebar"></aside>
+
   <main class="content">
     <div id="post">
       </div>
@@ -75,33 +68,6 @@
   document.getElementById("menuBtn").onclick = () => {
     document.getElementById("sidebar").classList.toggle("open");
   };
-
-  // [핵심] JSON의 설정을 읽어서 사진 배치를 변경하는 코드
-  const params = new URLSearchParams(location.search);
-  const postFile = params.get("post");
-
-  if (postFile) {
-    fetch(postFile)
-      .then(res => res.json())
-      .then(data => {
-        // JSON에 "layout": "grid"가 있을 때만 실행
-        if (data.layout === "grid") {
-          const checkImages = setInterval(() => {
-            const images = document.querySelectorAll("#post .img-wrap");
-            if (images.length >= 2) {
-              const gridDiv = document.createElement("div");
-              gridDiv.className = "photo-grid";
-              images[0].parentNode.insertBefore(gridDiv, images[0]);
-              gridDiv.appendChild(images[0]);
-              gridDiv.appendChild(images[1]);
-              clearInterval(checkImages);
-            }
-          }, 100);
-          // 3초 뒤에는 체크 중지 (무한루프 방지)
-          setTimeout(() => clearInterval(checkImages), 3000);
-        }
-      });
-  }
 </script>
 
 </body>
