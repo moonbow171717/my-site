@@ -352,6 +352,14 @@
   },
   
   {
+    "title": "어쩌다 내 인생에",
+    "date": "1902-01-01",
+    "category": "diary",
+    "parent": "쥬얀",
+    "sub": "JA"
+  },
+  
+  {
     "title": "자동화 성공",
     "date": "2026-02-25",
     "category": "diary",
