@@ -23,7 +23,7 @@
       text-transform: uppercase;
     }
 
-    /* 줄바꿈 버그 수정 완료 */
+    /* 줄바꿈 버그 수정 */
     #post {
       word-break: break-all;
       overflow-wrap: break-word;
@@ -38,13 +38,12 @@
       margin: 15px 0;
     }
 
-    /* [추가] 맨 위로 가기 버튼 스타일 */
+    /* [추가] 위로 가기 버튼 디자인 */
     #scrollTopBtn {
-      display: none; /* 처음엔 숨김 */
       position: fixed;
       bottom: 30px;
       right: 25px;
-      z-index: 999;
+      z-index: 1000;
       width: 45px;
       height: 45px;
       background-color: rgba(255, 255, 255, 0.1);
@@ -53,23 +52,12 @@
       border-radius: 50%;
       cursor: pointer;
       font-size: 20px;
-      backdrop-filter: blur(8px); /* 반투명 유리 느낌 */
+      backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
-      transition: all 0.3s ease;
-      display: flex; /* Flex를 미리 선언하되 숨김 상태로 시작 */
+      display: none; /* 스크립트에서 제어함 */
       align-items: center;
       justify-content: center;
-      opacity: 0;
-    }
-    
-    #scrollTopBtn.show {
-      display: flex;
-      opacity: 1;
-    }
-
-    #scrollTopBtn:hover {
-      background-color: rgba(255, 255, 255, 0.2);
-      transform: translateY(-5px); /* 호버 시 살짝 떠오름 */
+      transition: background 0.3s;
     }
   </style>
 </head>
@@ -94,5 +82,41 @@
   <aside class="sidebar" id="sidebar"></aside>
 
   <main class="content">
-    <div id="post"></div>
-  </
+    <div id="post">
+      </div>
+  </main>
+</div>
+
+<script src="viewer.js?v=4"></script>
+
+<script>
+  // 메뉴 토글 기능
+  const menuBtn = document.getElementById("menuBtn");
+  if(menuBtn) {
+    menuBtn.onclick = () => {
+      document.getElementById("sidebar").classList.toggle("open");
+    };
+  }
+
+  // [추가] 위로 가기 버튼 기능
+  const topBtn = document.getElementById("scrollTopBtn");
+
+  window.onscroll = function() {
+    // 300px 이상 내리면 버튼 보이고, 아니면 숨김
+    if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+      topBtn.style.display = "flex";
+    } else {
+      topBtn.style.display = "none";
+    }
+  };
+
+  topBtn.onclick = function() {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+</script>
+
+</body>
+</html>
