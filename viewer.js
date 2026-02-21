@@ -62,24 +62,32 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch("posts/index.json?v=" + Date.now())
           .then(res => res.json())
           .then(allPosts => {
-            // 현재 글의 sub 값 (공백 제거)
-            const currentSub = (p.sub || "").trim();
+            // 현재 글의 sub 값에서 공백을 싹 제거하고 소문자로 만듭니다. (예: "잡담")
+            const currentSubClean = (p.sub || "").replace(/\s/g, "").toLowerCase();
 
+            // index.json에서 같은 그룹의 글들을 찾을 때도 공백을 무시하고 비교합니다.
             const seriesPosts = allPosts
-              .filter(item => item.sub && item.sub.trim() === currentSub)
+              .filter(item => {
+                if (!item.sub) return false;
+                const itemSubClean = item.sub.replace(/\s/g, "").toLowerCase();
+                // "끄적끄적/잡담"에 "잡담"이 포함되므로 매칭 성공!
+                return itemSubClean === currentSubClean || itemSubClean.includes(currentSubClean) || currentSubClean.includes(itemSubClean);
+              })
               .sort((a, b) => new Date(a.date) - new Date(b.date));
 
-            const currentIndex = seriesPosts.findIndex(item => `posts/${item.file || item.date}.json` === postUrl);
+            const currentIndex = seriesPosts.findIndex(item => {
+              const itemPath = `posts/${item.file || item.date}.json`;
+              return itemPath === postUrl;
+            });
 
             const navContainer = document.getElementById("series-nav");
             if (currentIndex !== -1 && seriesPosts.length > 1) {
               
-              // 💡 여기서 '글'로 표시할 소분류(sub) 이름들을 지정합니다.
-              // NR, 잡담, 일상, 카페 등이 여기에 해당합니다.
-              const postUnits = ["일상", "카페", "NR", "잡담"]; 
+              // 💡 직접 지정 리스트: '글'로 표시하고 싶은 단어들
+              const postUnits = ["일상", "카페", "nr", "잡담", "기록"]; 
               
-              // 현재 카테고리 이름에 위 단어 중 하나라도 포함되어 있으면 '글', 아니면 '화'
-              const isPostUnit = postUnits.some(u => currentSub.includes(u));
+              // 현재 카테고리 이름에 위 단어 중 하나라도 들어있으면 '글', 아니면 '화'
+              const isPostUnit = postUnits.some(u => currentSubClean.includes(u));
               const unit = isPostUnit ? "글" : "화";
               
               let navHtml = "";
