@@ -65,19 +65,19 @@ body {
   gap: 40px;
 }
 
-/* ===== 사이드바 (여백 수정됨) ===== */
+/* ===== 사이드바 (여백 확실히 수정) ===== */
 .sidebar {
   width: 180px;
   flex-shrink: 0;
 }
 
-/* 상위 메뉴 공통 - 패딩을 조절하여 글자가 왼쪽으로 붙는 현상 해결 */
+/* 상위 메뉴: 좌측 여백을 16px로 설정 */
 .sidebar a, .menu-toggle {
   display: block;
   text-decoration: none;
   color: #8b90a0;
   font-size: 14px;
-  padding: 10px 16px; /* 좌우 여백을 16px로 늘려 글자가 박스 안으로 들어오게 함 */
+  padding: 10px 16px; 
   border-radius: 8px;
   transition: 0.2s;
   cursor: pointer;
@@ -94,18 +94,19 @@ body {
   font-weight: 600;
 }
 
-/* 아코디언 서브 리스트 */
+/* 아코디언 서브 리스트: 이미지 86dd06에서 딱 붙어 보이던 부분 수정 */
 .sub-list {
-  margin-left: 15px;
+  margin-left: 10px;
   border-left: 1px solid #2a3040;
-  padding-left: 5px;
+  padding-left: 0px; /* 여기서 여백을 주지 않고 a 태그 자체에서 패딩을 줌 */
   margin-bottom: 10px;
 }
 
 .sub-list a {
   font-size: 13px;
-  padding: 8px 14px; /* 서브 메뉴도 동일하게 여백 확보 */
+  padding: 8px 16px !important; /* 좌측 여백 16px 강제 적용 */
   margin-bottom: 2px;
+  margin-left: 5px; /* 선에서 살짝 띄움 */
 }
 
 /* ===== 콘텐츠 ===== */
