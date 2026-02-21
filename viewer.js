@@ -73,6 +73,9 @@ document.addEventListener("DOMContentLoaded", () => {
           <article class="post-view">
             <h1 class="post-title">${p.title}</h1>
             <div class="meta">${p.date}</div>
+            <div style="margin-top:20px; text-align: left;">
+              <a class="back-btn" href="${fromPath}">${backText}</a>
+            </div>
             ${images}
             <div class="post-content">${content}</div>
             <div style="margin-top:50px; text-align: left;">
