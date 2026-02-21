@@ -37,6 +37,40 @@
       border-radius: 20px;
       margin: 15px 0;
     }
+
+    /* [추가] 맨 위로 가기 버튼 스타일 */
+    #scrollTopBtn {
+      display: none; /* 처음엔 숨김 */
+      position: fixed;
+      bottom: 30px;
+      right: 25px;
+      z-index: 999;
+      width: 45px;
+      height: 45px;
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 20px;
+      backdrop-filter: blur(8px); /* 반투명 유리 느낌 */
+      -webkit-backdrop-filter: blur(8px);
+      transition: all 0.3s ease;
+      display: flex; /* Flex를 미리 선언하되 숨김 상태로 시작 */
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+    }
+    
+    #scrollTopBtn.show {
+      display: flex;
+      opacity: 1;
+    }
+
+    #scrollTopBtn:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-5px); /* 호버 시 살짝 떠오름 */
+    }
   </style>
 </head>
 
@@ -54,21 +88,11 @@
   </div>
 </nav>
 
+<button id="scrollTopBtn" title="Go to top">↑</button>
+
 <div class="layout">
   <aside class="sidebar" id="sidebar"></aside>
 
   <main class="content">
-    <div id="post">
-      </div>
-  </main>
-</div>
-
-<script src="viewer.js?v=4"></script>
-<script>
-  document.getElementById("menuBtn").onclick = () => {
-    document.getElementById("sidebar").classList.toggle("open");
-  };
-</script>
-
-</body>
-</html>
+    <div id="post"></div>
+  </
