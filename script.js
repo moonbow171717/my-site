@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const parentParam = params.get("parent");
   const subParam = params.get("sub");
 
+  // 📸 Photos 모드
   if (category === "photos") {
     subMenu.innerHTML = `<a href="index.html?cat=photos" class="active">모든 사진</a><a href="index.html">홈으로</a>`;
     list.className = "photo-grid";
@@ -34,16 +35,18 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
+  // 📝 Posts 모드
   fetch("posts/index.json?v=" + new Date().getTime())
     .then(r => r.json())
     .then(originalPosts => {
       const validPosts = originalPosts.filter(p => p && p.title && p.date);
-      
-      // 1. 메뉴 생성 (기호 없이 깔끔하게)
+      let posts = [...validPosts];
+
+      // 1. 메뉴 생성 (기호 완전 제거 버전)
       if (category === "diary") {
         const menuStructure = [
           { name: "글", subs: ["일상", "카페"] },
-          { name: "냐람", subs: ["연애 포기 각서", "홈스윗홈"] },
+          { name: "냐럄", subs: ["연애 포기 각서", "홈스윗홈"] },
           { name: "냐쥬", subs: [] },
           { name: "끄적끄적", subs: ["잡담"] }
         ];
@@ -51,11 +54,14 @@ document.addEventListener("DOMContentLoaded", () => {
         let menuHtml = `<a href="index.html?cat=diary"${!parentParam && !subParam ? ' class="active"' : ''}>전체 기록</a>`;
         menuStructure.forEach(m => {
           const isParentActive = (parentParam === m.name && !subParam);
-          menuHtml += `<div style="margin-top:10px;">
-            <a href="index.html?cat=diary&parent=${encodeURIComponent(m.name)}"${isParentActive ? ' class="active"' : ''} style="font-weight:bold; color:#aaa; display:block; margin-bottom:5px;">${m.name}</a>`;
+          // 샾(#) 제거
+          menuHtml += `<div style="margin-top:12px;">
+            <a href="index.html?cat=diary&parent=${encodeURIComponent(m.name)}"${isParentActive ? ' class="active"' : ''} style="font-weight:bold; color:#fff; display:block; margin-bottom:5px;">${m.name}</a>`;
+          
           m.subs.forEach(s => {
             const isSubActive = (subParam === s);
-            menuHtml += `<a href="index.html?cat=diary&parent=${encodeURIComponent(m.name)}&sub=${encodeURIComponent(s)}"${isSubActive ? ' class="active"' : ''} style="padding-left:15px; font-size:0.9em; display:block; margin-bottom:3px;">${s}</a>`;
+            // ㄴ 기호 제거 및 들여쓰기만 유지
+            menuHtml += `<a href="index.html?cat=diary&parent=${encodeURIComponent(m.name)}&sub=${encodeURIComponent(s)}"${isSubActive ? ' class="active"' : ''} style="padding-left:15px; font-size:0.9em; display:block; margin-bottom:4px; color:#aaa;">${s}</a>`;
           });
           menuHtml += `</div>`;
         });
@@ -64,21 +70,20 @@ document.addEventListener("DOMContentLoaded", () => {
         subMenu.innerHTML = `<a href="index.html" class="active">최신글 목록</a>`;
       }
 
-      // 2. [수정 핵심] 필터링 로직 - 더 직관적으로 변경
-      let posts = [...validPosts];
-
-      // 카테고리(diary 등) 필터
+      // 2. 필터링 로직 (오타 및 공백 방어)
       if (category) {
         posts = posts.filter(p => p.category === category);
       }
       
-      // 상세 필터
       if (subParam) {
-        // 하위 메뉴를 눌렀을 때 (예: 홈스윗홈)
         posts = posts.filter(p => String(p.sub).trim() === subParam.trim());
       } else if (parentParam) {
-        // 상위 메뉴를 눌렀을 때 (예: 냐람) -> parent가 일치하는 모든 글
-        posts = posts.filter(p => String(p.parent).trim() === parentParam.trim());
+        // [강력 필터] parentParam이 포함되거나 비슷한 이름이면 다 보여줍니다. (냐람 vs 냐럄 방어)
+        posts = posts.filter(p => {
+          const pParent = String(p.parent || "").trim();
+          const pTarget = parentParam.trim();
+          return pParent === pTarget || pParent.includes(pTarget) || pTarget.includes(pParent);
+        });
       }
 
       // 3. 리스트 출력
@@ -110,4 +115,4 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error(err);
       list.innerHTML = "글을 불러오는 중 오류가 발생했습니다.";
     });
-});ㅊ
+});
