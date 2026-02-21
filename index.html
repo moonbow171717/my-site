@@ -15,7 +15,7 @@
 
 <nav class="topbar">
   <div class="top-inner">
-    <div class="logo" style="letter-spacing: 1px;">MY ARCHIVE</div>
+    <div class="logo">MY ARCHIVE</div>
     <div class="top-links">
       <a href="index.html">HOME</a>
       <a href="index.html?cat=diary">DIARY</a>
@@ -55,25 +55,42 @@
 </script>
 
 <style>
-  /* [추가] 로고 폰트 강조 */
+  /* 로고: 폰트 두께를 키우고 은은한 그라데이션을 넣었습니다 */
   .logo {
     font-family: 'Pretendard', sans-serif;
-    font-weight: 700;
-    color: #fff;
+    font-weight: 800; 
+    letter-spacing: 1.5px;
+    background: linear-gradient(180deg, #FFFFFF 0%, #A0A5B5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
   }
 
-  /* PC에서는 모바일 전용 메뉴 숨기기 */
+  /* PC에서는 모바일 메뉴 숨기기 */
   @media (min-width: 769px) {
     .mobile-main-menu {
       display: none !important;
     }
   }
 
-  /* 모바일 메인 메뉴 텍스트 정렬 보정 */
+  /* 모바일 메뉴: 간격과 텍스트 스타일을 다듬었습니다 */
   @media (max-width: 768px) {
+    .mobile-main-menu {
+      display: grid !important;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #2a3040;
+      padding-bottom: 15px;
+    }
     .mobile-main-menu a {
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      font-weight: 600;
+      text-align: center;
+      color: #fff !important;
+      text-decoration: none;
+      font-size: 13px;
     }
   }
 </style>
