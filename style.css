@@ -1,3 +1,5 @@
+
+
 /* ===== 기본 ===== */
 body {
   margin: 0;
@@ -195,24 +197,17 @@ body {
   to { opacity: 1; }
 }
 
-/* ===== 뒤로가기 (반투명 배경 버전) ===== */
+/* ===== 뒤로가기 ===== */
 .back-btn {
-  display: inline-block !important;
-  margin-top: 25px !important;
-  padding: 8px 15px !important;
-  background: rgba(255, 255, 255, 0.1) !important; /* 반투명 배경 살림 */
-  border-radius: 8px !important;
-  font-size: 13px !important;
-  text-decoration: none !important;
-  color: #e6e6e6 !important;
-  white-space: nowrap !important; /* 줄바꿈 절대 방지 */
-  border: 1px solid rgba(255, 255, 255, 0.05) !important;
-  transition: 0.2s;
+  display: inline-block;
+  margin-top: 50px;
+  font-size: 13px;
+  text-decoration: none;
+  color: #7a8090;
 }
 
 .back-btn:hover {
-  background: rgba(255, 255, 255, 0.18) !important;
-  color: #fff !important;
+  color: #fff;
 }
 
 /* ===== Pinterest Photo Grid ===== */
@@ -244,7 +239,8 @@ body {
   opacity: 0.9;
 }
 
-/* ===== 반응형 ===== */
+/* ===== 반응형 (모바일 최적화 수정완료) ===== */
+
 @media (max-width: 1200px) {
   .photo-grid { column-count: 3; }
 }
@@ -266,6 +262,7 @@ body {
     box-sizing: border-box;
   }
 
+  /* 🎨 모바일 메뉴 상자 디자인 */
   .sidebar.open {
     display: block !important;
     background: #171a21;
@@ -277,6 +274,7 @@ body {
     animation: slideDown 0.3s ease-out;
   }
 
+  /* 메인 버튼 가로 3칸 배치 */
   .mobile-main-menu {
     display: grid !important;
     grid-template-columns: repeat(3, 1fr);
@@ -298,6 +296,7 @@ body {
     font-weight: 600;
   }
 
+  /* 하위 카테고리(일상 등) 스타일 */
   #sub-menu a {
     padding: 12px 15px;
     margin-bottom: 6px;
@@ -332,3 +331,4 @@ body {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
