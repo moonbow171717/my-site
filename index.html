@@ -10,72 +10,6 @@
       location.href = "login.html";
     }
   </script>
-  <style>
-    /* 로고: 폰트 두께를 키우고 은은한 그라데이션을 넣었습니다 */
-    .logo {
-      font-family: 'Pretendard', sans-serif;
-      font-weight: 800; 
-      letter-spacing: 1.5px;
-      background: linear-gradient(180deg, #FFFFFF 0%, #A0A5B5 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      display: inline-block;
-      text-transform: uppercase;
-    }
-
-    /* PC에서는 모바일 메뉴 숨기기 */
-    @media (min-width: 769px) {
-      .mobile-main-menu {
-        display: none !important;
-      }
-    }
-
-    /* 모바일 메뉴: 간격과 텍스트 스타일을 다듬었습니다 */
-    @media (max-width: 768px) {
-      .mobile-main-menu {
-        display: grid !important;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
-        margin-bottom: 20px;
-        border-bottom: 1px solid #2a3040;
-        padding-bottom: 15px;
-      }
-      .mobile-main-menu a {
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-weight: 600;
-        text-align: center;
-        color: #fff !important;
-        text-decoration: none;
-        font-size: 13px;
-      }
-    }
-
-    /* [추가] 위로 가기 버튼 디자인 */
-    #scrollTopBtn {
-      position: fixed;
-      bottom: 30px;
-      right: 25px;
-      z-index: 1000;
-      width: 45px;
-      height: 45px;
-      background-color: rgba(255, 255, 255, 0.1);
-      color: white;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 20px;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      display: none; /* 초기 상태 숨김 */
-      align-items: center;
-      justify-content: center;
-      transition: background 0.3s;
-    }
-    #scrollTopBtn:hover {
-      background-color: rgba(255, 255, 255, 0.2);
-    }
-  </style>
 </head>
 <body>
 
@@ -95,11 +29,6 @@
 
 <div class="layout">
   <aside class="sidebar" id="sidebar">
-    <div class="mobile-main-menu">
-      <a href="index.html">HOME</a>
-      <a href="index.html?cat=diary">DIARY</a>
-      <a href="index.html?cat=photos">PHOTOS</a>
-    </div>
     <div id="sub-menu"></div>
   </aside>
 
@@ -109,37 +38,5 @@
 </div>
 
 <script src="script.js"></script>
-
-<script>
-  // 메뉴 토글 기능
-  const menuBtn = document.getElementById("menuBtn");
-  const sidebar = document.getElementById("sidebar");
-
-  if (menuBtn && sidebar) {
-    menuBtn.onclick = () => {
-      sidebar.classList.toggle("open");
-    };
-  }
-
-  // [추가] 스크롤 상단 이동 기능
-  const topBtn = document.getElementById("scrollTopBtn");
-
-  window.onscroll = function() {
-    // 300px 이상 내려오면 버튼 노출
-    if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
-      topBtn.style.display = "flex";
-    } else {
-      topBtn.style.display = "none";
-    }
-  };
-
-  topBtn.onclick = function() {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth' // 부드럽게 이동
-    });
-  };
-</script>
-
 </body>
 </html>
