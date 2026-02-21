@@ -1,4 +1,3 @@
-
 /* ===== 기본 ===== */
 body {
   margin: 0;
@@ -66,28 +65,47 @@ body {
   gap: 40px;
 }
 
-/* ===== 사이드바 ===== */
+/* ===== 사이드바 (수정됨) ===== */
 .sidebar {
   width: 180px;
   flex-shrink: 0;
 }
 
-.sidebar a {
+/* 상위 메뉴 공통 */
+.sidebar a, .menu-toggle {
   display: block;
   text-decoration: none;
   color: #8b90a0;
   font-size: 14px;
-  margin-bottom: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
   transition: 0.2s;
+  cursor: pointer;
 }
 
-.sidebar a:hover {
+.sidebar a:hover, .menu-toggle:hover {
+  background: rgba(255, 255, 255, 0.05);
   color: #fff;
 }
 
 .sidebar a.active {
-  color: #fff;
-  font-weight: 500;
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.1);
+  font-weight: 600;
+}
+
+/* 아코디언 서브 리스트 */
+.sub-list {
+  margin-left: 15px;
+  border-left: 1px solid #2a3040;
+  padding-left: 5px;
+  margin-bottom: 10px;
+}
+
+.sub-list a {
+  font-size: 13px;
+  padding: 6px 12px;
+  margin-bottom: 2px;
 }
 
 /* ===== 콘텐츠 ===== */
@@ -238,30 +256,12 @@ body {
   opacity: 0.9;
 }
 
-/* ===== 반응형 (모바일 최적화 수정완료) ===== */
-
-@media (max-width: 1200px) {
-  .photo-grid { column-count: 3; }
-}
-
-@media (max-width: 800px) {
-  .photo-grid { column-count: 2; }
-}
-
+/* ===== 반응형 ===== */
+@media (max-width: 1200px) { .photo-grid { column-count: 3; } }
+@media (max-width: 800px) { .photo-grid { column-count: 2; } }
 @media (max-width: 768px) {
-  .layout {
-    flex-direction: column;
-    gap: 10px;
-    margin: 20px auto;
-  }
-
-  .sidebar {
-    display: none;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  /* 🎨 모바일 메뉴 상자 디자인 */
+  .layout { flex-direction: column; gap: 10px; margin: 20px auto; }
+  .sidebar { display: none; width: 100%; box-sizing: border-box; }
   .sidebar.open {
     display: block !important;
     background: #171a21;
@@ -272,63 +272,11 @@ body {
     box-shadow: 0 15px 40px rgba(0,0,0,0.4);
     animation: slideDown 0.3s ease-out;
   }
-
-  /* 메인 버튼 가로 3칸 배치 */
-  .mobile-main-menu {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #2a3040;
-    padding-bottom: 15px;
-  }
-
-  .mobile-main-menu a {
-    background: #232833 !important;
-    padding: 12px 5px !important;
-    border-radius: 12px !important;
-    font-size: 13px !important;
-    text-align: center;
-    border: none !important;
-    margin-bottom: 0 !important;
-    color: #fff !important;
-    font-weight: 600;
-  }
-
-  /* 하위 카테고리(일상 등) 스타일 */
-  #sub-menu a {
-    padding: 12px 15px;
-    margin-bottom: 6px;
-    background: rgba(255,255,255,0.03);
-    border-radius: 10px;
-    border: none;
-    color: #a0a5b5;
-    font-size: 14px;
-    display: block;
-  }
-
-  #sub-menu a.active {
-    background: #313846;
-    color: #fff;
-    font-weight: 600;
-  }
-
-  .menu-btn {
-    display: block !important;
-  }
-
-  .top-links {
-    display: none !important;
-  }
+  .menu-btn { display: block !important; }
+  .top-links { display: none !important; }
 }
-
-@media (max-width: 500px) {
-  .photo-grid { column-count: 1; }
-}
-
+@media (max-width: 500px) { .photo-grid { column-count: 1; } }
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
-
