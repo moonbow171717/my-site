@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const parentParam = params.get("parent");
   const subParam = params.get("sub");
 
-  // 1. PHOTOS 카테고리 로직 (사용자님 원본 그대로 유지)
+  // [기존 로직 유지] PHOTOS 카테고리
   if (category === "photos") {
     subMenu.innerHTML = `<a href="index.html?cat=photos" class="active">모든 사진</a><a href="index.html">홈으로</a>`;
     list.className = "photo-grid";
@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const item = document.createElement("div");
           item.className = "photo-card";
           item.innerHTML = `<img src="${img.src}">`;
-          item.onclick = () => location.href = `viewer.html?img=${encodeURIComponent(img.src)}&from=index.html?cat=photos`;
+          item.onclick = () => location.href = `viewer.html?img=${encodeURIComponent(img.src)}&from=photos`;
           list.appendChild(item);
         };
       });
@@ -35,14 +35,13 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // 2. DIARY 및 일반 글 목록 로딩
+  // [기존 로직 유지] 게시글 로딩
   fetch("posts/index.json?v=" + new Date().getTime())
     .then(r => r.json())
     .then(originalPosts => {
       const validPosts = originalPosts.filter(p => p && p.title && p.date);
       let posts = [...validPosts];
 
-      // 사이드바 메뉴 생성
       if (category === "diary") {
         const menuStructure = [
           { name: "글", subs: ["일상", "카페"] },
@@ -51,17 +50,24 @@ document.addEventListener("DOMContentLoaded", () => {
           { name: "끄적끄적", subs: ["잡담"] }
         ];
 
-        let menuHtml = `<a href="index.html?cat=diary" class="menu-parent ${!parentParam && !subParam ? 'active' : ''}" style="color:#8b90a0; display:block; margin-bottom:15px;">전체 기록</a>`;
+        let menuHtml = `<a href="index.html?cat=diary"${!parentParam && !subParam ? ' class="active"' : ''}>전체 기록</a>`;
         
         menuStructure.forEach(m => {
-          const isOpened = (parentParam === m.name);
+          const isParentActive = (parentParam === m.name);
+          // [수정] 아코디언 구조 적용 (디자인은 유지)
           menuHtml += `
-            <div class="menu-group">
-              <div class="menu-parent" onclick="const next = this.nextElementSibling; if(next) next.classList.toggle('active')">${m.name}</div>
-              <div class="sub-menu-list ${isOpened ? 'active' : ''}">
+            <div style="margin-top:12px;">
+              <div class="menu-toggle" style="font-weight:bold; color:#fff; cursor:pointer; margin-bottom:5px;" 
+                   onclick="const next = this.nextElementSibling; next.style.display = (next.style.display === 'none' ? 'block' : 'none');">
+                ${m.name}
+              </div>
+              <div class="sub-list" style="display: ${isParentActive ? 'block' : 'none'};">
                 ${m.subs.map(s => `
                   <a href="index.html?cat=diary&parent=${encodeURIComponent(m.name)}&sub=${encodeURIComponent(s)}" 
-                     class="${subParam === s ? 'active' : ''}">${s}</a>
+                     class="${subParam === s ? 'active' : ''}" 
+                     style="padding-left:15px; font-size:0.95em; display:block; margin-bottom:4px; color:#aaa;">
+                    ${s}
+                  </a>
                 `).join('')}
               </div>
             </div>`;
@@ -71,38 +77,32 @@ document.addEventListener("DOMContentLoaded", () => {
         subMenu.innerHTML = `<a href="index.html" class="active">최신글 목록</a>`;
       }
 
-      // 필터링 적용
-      if (category) {
-        posts = posts.filter(p => p.category === category);
-      }
-      if (subParam) {
-        posts = posts.filter(p => p.sub === subParam);
-      } else if (parentParam) {
-        posts = posts.filter(p => p.parent === parentParam);
-      }
-
-      // 정렬 및 출력
-      posts.sort((a, b) => new Date(b.date) - new Date(a.date));
-      list.className = ""; // 포토 그리드 해제
-      list.innerHTML = posts.map(p => {
-        let fileName = p.file || p.date;
-        if (!fileName.toString().endsWith('.json')) fileName += '.json';
-        const fromUrl = location.search || "index.html";
-        
-        return `
-          <div class="post-item" onclick="location.href='viewer.html?post=posts/${fileName}&from=${encodeURIComponent(fromUrl)}'">
-            <h3>${p.title}</h3>
-            <span class="date">${p.date}</span>
-            <p>${p.excerpt || "내용 보기"}</p>
-          </div>
-        `;
-      }).join("");
+      // 필터링 및 출력 (기존 로직 그대로)
+      if (category) posts = posts.filter(p => p.category === category);
+      if (subParam) posts = posts.filter(p => p.sub === subParam);
+      else if (parentParam) posts = posts.filter(p => p.parent === parentParam);
 
       if (posts.length === 0) {
-        list.innerHTML = `<div style="padding:50px; text-align:center; color:#8b90a0;">게시물이 없습니다.</div>`;
+        list.innerHTML = `<div style="padding:20px; color:#666;">해당 카테고리에 등록된 글이 없습니다.</div>`;
+        return;
       }
+
+      posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+      list.innerHTML = "";
+      posts.forEach(p => {
+        const item = document.createElement("div");
+        item.className = "post-item";
+        item.innerHTML = `<h3>${p.title}</h3><span class="date">${p.date}</span><p>${p.excerpt || "내용 보기"}</p>`;
+        item.onclick = () => {
+          let fromPath = location.search || "index.html";
+          let fileName = p.file || p.date;
+          if (!fileName.toString().endsWith('.json')) fileName += '.json';
+          location.href = `viewer.html?post=posts/${fileName}&from=${encodeURIComponent(fromPath)}`;
+        };
+        list.appendChild(item);
+      });
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(err);
       list.innerHTML = "글을 불러오는 중 오류가 발생했습니다.";
     });
