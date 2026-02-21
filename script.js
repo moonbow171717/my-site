@@ -10,8 +10,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const params = new URLSearchParams(location.search);
   const category = params.get("cat");
-  const parentParam = params.get("parent");
-  const subParam = params.get("sub");
+  // 주소창에서 가져온 한글을 표준 형식(NFC)으로 변환하여 매칭 확률을 높입니다.
+  const parentParam = params.get("parent") ? decodeURIComponent(params.get("parent")).normalize('NFC') : null;
+  const subParam = params.get("sub") ? decodeURIComponent(params.get("sub")).normalize('NFC') : null;
 
   if (category === "photos") {
     subMenu.innerHTML = `<a href="index.html?cat=photos" class="active">모든 사진</a><a href="index.html">홈으로</a>`;
@@ -38,9 +39,8 @@ document.addEventListener("DOMContentLoaded", () => {
     .then(r => r.json())
     .then(originalPosts => {
       const validPosts = originalPosts.filter(p => p && p.title && p.date);
-      let posts = [...validPosts];
-
-      // 1. 메뉴 생성 (기호 완전 삭제!)
+      
+      // 1. 메뉴 그리기 (기호 없이 깔끔하게)
       if (category === "diary") {
         const menuStructure = [
           { name: "글", subs: ["일상", "카페"] },
@@ -51,13 +51,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let menuHtml = `<a href="index.html?cat=diary"${!parentParam && !subParam ? ' class="active"' : ''}>전체 기록</a>`;
         menuStructure.forEach(m => {
-          const isParentActive = (parentParam === m.name && !subParam);
-          // 깔끔하게 이름만 노출
-          menuHtml += `<div style="margin-top:12px;">
-            <a href="index.html?cat=diary&parent=${encodeURIComponent(m.name)}"${isParentActive ? ' class="active"' : ''} style="font-weight:bold; color:#fff; display:block; margin-bottom:5px;">${m.name}</a>`;
+          const isParentActive = (parentParam === m.normalize('NFC'));
+          // # 기호 제거
+          menuHtml += `<div style="margin-top:15px;">
+            <a href="index.html?cat=diary&parent=${encodeURIComponent(m.name)}"${isParentActive && !subParam ? ' class="active"' : ''} style="font-weight:bold; color:#fff; display:block; margin-bottom:5px;">${m.name}</a>`;
+          
           m.subs.forEach(s => {
-            const isSubActive = (subParam === s);
-            // 기호 없이 들여쓰기만 유지
+            const isSubActive = (subParam === s.normalize('NFC'));
+            // ㄴ 기호 제거 및 들여쓰기 유지
             menuHtml += `<a href="index.html?cat=diary&parent=${encodeURIComponent(m.name)}&sub=${encodeURIComponent(s)}"${isSubActive ? ' class="active"' : ''} style="padding-left:15px; font-size:0.9em; display:block; margin-bottom:4px; color:#aaa;">${s}</a>`;
           });
           menuHtml += `</div>`;
@@ -67,19 +68,18 @@ document.addEventListener("DOMContentLoaded", () => {
         subMenu.innerHTML = `<a href="index.html" class="active">최신글 목록</a>`;
       }
 
-      // 2. 정밀 필터링 로직
-      // (1) 카테고리가 있으면 먼저 diary 글만 남김
+      // 2. 필터링 로직 (한글 비교 강화)
+      let posts = [...validPosts];
       if (category) {
         posts = posts.filter(p => p.category === category);
       }
       
-      // (2) 상세 필터링
       if (subParam) {
-        // 하위 메뉴 클릭 시 (예: 홈스윗홈)
-        posts = posts.filter(p => String(p.sub || "").trim() === subParam.trim());
+        // 하위 메뉴 클릭 시
+        posts = posts.filter(p => p.sub && p.sub.normalize('NFC') === subParam);
       } else if (parentParam) {
-        // 상위 메뉴 클릭 시 (예: 냐람) -> parent가 정확히 '냐람'인 것만!
-        posts = posts.filter(p => String(p.parent || "").trim() === parentParam.trim());
+        // 상위 메뉴(냐람 등) 클릭 시 모든 해당 parent 글 표시
+        posts = posts.filter(p => p.parent && p.parent.normalize('NFC') === parentParam);
       }
 
       // 3. 리스트 출력
@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
       list.innerHTML = "";
 
       if (posts.length === 0) {
-        list.innerHTML = `<div style="padding:20px; color:#666; text-align:center;">해당 카테고리에 등록된 글이 없습니다.</div>`;
+        list.innerHTML = `<div style="padding:50px; text-align:center; color:#666;">해당 카테고리에 등록된 글이 없습니다.</div>`;
         return;
       }
 
@@ -96,8 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
         item.className = "post-item";
         item.innerHTML = `<h3>${p.title}</h3><span class="date">${p.date}</span><p>${p.excerpt || "내용 보기"}</p>`;
         item.onclick = () => {
-          let fromPath = "index.html";
-          if (category) fromPath += `?cat=${category}`;
+          let fromPath = `index.html?cat=${category}`;
           if (parentParam) fromPath += `&parent=${encodeURIComponent(parentParam)}`;
           if (subParam) fromPath += `&sub=${encodeURIComponent(subParam)}`;
           let fileName = p.file || p.date;
@@ -107,8 +106,8 @@ document.addEventListener("DOMContentLoaded", () => {
         list.appendChild(item);
       });
     })
-    .catch((err) => {
+    .catch(err => {
       console.error(err);
-      list.innerHTML = "데이터를 가져오는 중 오류가 발생했습니다.";
+      list.innerHTML = "데이터 로딩 중 오류가 발생했습니다.";
     });
 });
