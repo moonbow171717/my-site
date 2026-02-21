@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", () => {
   const list = document.getElementById("post-list");
   const subMenu = document.getElementById("sub-menu");
@@ -28,7 +27,8 @@ document.addEventListener("DOMContentLoaded", () => {
           const item = document.createElement("div");
           item.className = "photo-card";
           item.innerHTML = `<img src="${img.src}">`;
-          item.onclick = () => location.href = `viewer.html?img=${encodeURIComponent(img.src)}&from=photos`;
+          // [수정] from 파라미터를 정확하게 index.html?cat=photos 로 전달
+          item.onclick = () => location.href = `viewer.html?img=${encodeURIComponent(img.src)}&from=${encodeURIComponent('index.html?cat=photos')}`;
           list.appendChild(item);
         };
       });
@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // [기존 로직 유지] 게시글 로딩
+  // 게시글 로딩 로직
   fetch("posts/index.json?v=" + new Date().getTime())
     .then(r => r.json())
     .then(originalPosts => {
@@ -51,24 +51,19 @@ document.addEventListener("DOMContentLoaded", () => {
           { name: "끄적끄적", subs: ["잡담"] }
         ];
 
-        let menuHtml = `<a href="index.html?cat=diary"${!parentParam && !subParam ? ' class="active"' : ''}>전체 기록</a>`;
-        
+        let menuHtml = `<a href="index.html?cat=diary" class="${!parentParam && !subParam ? 'active' : ''}">전체 기록</a>`;
         menuStructure.forEach(m => {
           const isParentActive = (parentParam === m.name);
-          // [수정] 아코디언 구조 적용 (디자인은 유지)
           menuHtml += `
             <div style="margin-top:12px;">
-              <div class="menu-toggle" style="font-weight:bold; color:#fff; cursor:pointer; margin-bottom:5px;" 
+              <div class="menu-toggle" style="font-weight:bold; color:#fff; cursor:pointer;" 
                    onclick="const next = this.nextElementSibling; next.style.display = (next.style.display === 'none' ? 'block' : 'none');">
                 ${m.name}
               </div>
               <div class="sub-list" style="display: ${isParentActive ? 'block' : 'none'};">
                 ${m.subs.map(s => `
                   <a href="index.html?cat=diary&parent=${encodeURIComponent(m.name)}&sub=${encodeURIComponent(s)}" 
-                     class="${subParam === s ? 'active' : ''}" 
-                     style="padding-left:15px; font-size:0.95em; display:block; margin-bottom:4px; color:#aaa;">
-                    ${s}
-                  </a>
+                     class="${subParam === s ? 'active' : ''}">${s}</a>
                 `).join('')}
               </div>
             </div>`;
@@ -78,15 +73,9 @@ document.addEventListener("DOMContentLoaded", () => {
         subMenu.innerHTML = `<a href="index.html" class="active">최신글 목록</a>`;
       }
 
-      // 필터링 및 출력 (기존 로직 그대로)
       if (category) posts = posts.filter(p => p.category === category);
       if (subParam) posts = posts.filter(p => p.sub === subParam);
       else if (parentParam) posts = posts.filter(p => p.parent === parentParam);
-
-      if (posts.length === 0) {
-        list.innerHTML = `<div style="padding:20px; color:#666;">해당 카테고리에 등록된 글이 없습니다.</div>`;
-        return;
-      }
 
       posts.sort((a, b) => new Date(b.date) - new Date(a.date));
       list.innerHTML = "";
@@ -95,16 +84,12 @@ document.addEventListener("DOMContentLoaded", () => {
         item.className = "post-item";
         item.innerHTML = `<h3>${p.title}</h3><span class="date">${p.date}</span><p>${p.excerpt || "내용 보기"}</p>`;
         item.onclick = () => {
-          let fromPath = location.search || "index.html";
+          let fromPath = location.search ? `index.html${location.search}` : "index.html";
           let fileName = p.file || p.date;
           if (!fileName.toString().endsWith('.json')) fileName += '.json';
           location.href = `viewer.html?post=posts/${fileName}&from=${encodeURIComponent(fromPath)}`;
         };
         list.appendChild(item);
       });
-    })
-    .catch((err) => {
-      console.error(err);
-      list.innerHTML = "글을 불러오는 중 오류가 발생했습니다.";
     });
 });
