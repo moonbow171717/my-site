@@ -27,11 +27,6 @@
       line-height: 1.8;
       color: #d1d5db;
     }
-    .img-wrap img {
-      width: 100%;
-      border-radius: 20px;
-      margin: 15px 0;
-    }
     #scrollTopBtn {
       position: fixed;
       bottom: 30px;
@@ -55,6 +50,7 @@
   </style>
 </head>
 <body>
+
 <nav class="topbar">
   <div class="top-inner">
     <div class="logo">MY ARCHIVE</div>
@@ -66,14 +62,19 @@
     <button class="menu-btn" id="menuBtn">☰</button>
   </div>
 </nav>
+
 <button id="scrollTopBtn" title="Go to top">↑</button>
+
 <div class="layout">
   <aside class="sidebar" id="sidebar"></aside>
+
   <main class="content">
     <div id="post"></div>
   </main>
 </div>
-<script src="viewer.js?v=5"></script>
+
+<script src="viewer.js?v=10"></script>
+
 <script>
   const menuBtn = document.getElementById("menuBtn");
   if(menuBtn) {
@@ -81,6 +82,7 @@
       document.getElementById("sidebar").classList.toggle("open");
     };
   }
+
   const topBtn = document.getElementById("scrollTopBtn");
   window.onscroll = function() {
     if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
@@ -89,9 +91,11 @@
       topBtn.style.display = "none";
     }
   };
+
   topBtn.onclick = function() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 </script>
+
 </body>
 </html>
