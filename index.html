@@ -11,7 +11,7 @@
     }
   </script>
   <style>
-    /* 1. 원래 로고 디자인 (그라데이션 복구) */
+    /* 로고: 폰트 두께를 키우고 은은한 그라데이션을 넣었습니다 */
     .logo {
       font-family: 'Pretendard', sans-serif;
       font-weight: 800; 
@@ -23,30 +23,14 @@
       text-transform: uppercase;
     }
 
-    /* 2. 사이드바 메뉴 스타일 (원래 디자인으로 100% 복구) */
-    .sidebar a {
-      display: block;
-      text-decoration: none !important; /* 파란색 링크 방지 */
-      color: #8b90a0;
-      font-size: 14px;
-      margin-bottom: 12px;
-      transition: 0.2s;
+    /* PC에서는 모바일 메뉴 숨기기 */
+    @media (min-width: 769px) {
+      .mobile-main-menu {
+        display: none !important;
+      }
     }
-    .sidebar a:hover, .sidebar a.active { color: #fff; }
 
-    /* 아코디언 관련 스타일 추가 */
-    .menu-group { margin-bottom: 12px; }
-    .menu-parent { 
-      font-weight: bold; color: #fff; cursor: pointer; 
-      font-size: 14px; margin-bottom: 8px; 
-    }
-    .sub-menu-list { 
-      display: none; padding-left: 15px; border-left: 1px solid #2a3040; margin-left: 2px;
-    }
-    .sub-menu-list.active { display: block; }
-    .sub-menu-list a { font-size: 13px; margin-bottom: 8px; }
-
-    /* 3. 모바일 메뉴 (기존 박스 디자인 유지) */
+    /* 모바일 메뉴: 간격과 텍스트 스타일을 다듬었습니다 */
     @media (max-width: 768px) {
       .mobile-main-menu {
         display: grid !important;
@@ -57,23 +41,48 @@
         padding-bottom: 15px;
       }
       .mobile-main-menu a {
-        background: #232833; padding: 12px 5px; border-radius: 12px;
-        text-align: center; color: #fff !important; font-size: 13px; font-weight: 600;
-      }
-      .sidebar.open {
-        display: block !important;
-        background: #171a21; padding: 20px; border-radius: 20px; border: 1px solid #2a3040;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+        text-align: center;
+        color: #fff !important;
+        text-decoration: none;
+        font-size: 13px;
       }
     }
 
-    /* 4. 위로 가기 버튼 */
+    /* 위로 가기 버튼 디자인 */
     #scrollTopBtn {
-      position: fixed; bottom: 30px; right: 25px; z-index: 1000;
-      width: 45px; height: 45px; background: rgba(255, 255, 255, 0.1);
-      color: white; border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 50%; cursor: pointer; font-size: 20px;
-      backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center;
+      position: fixed;
+      bottom: 30px;
+      right: 25px;
+      z-index: 1000;
+      width: 45px;
+      height: 45px;
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 20px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none; 
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s;
     }
+    #scrollTopBtn:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* [여기가 추가된 부분] 아코디언 메뉴 스타일 */
+    .menu-group { margin-bottom: 12px; }
+    .menu-parent { font-weight: bold; color: #fff; cursor: pointer; display: block; margin-bottom: 8px; font-size: 14px; }
+    .sub-menu-list { display: none; padding-left: 15px; border-left: 1px solid #2a3040; }
+    .sub-menu-list.active { display: block; }
+    .sub-menu-list a { font-size: 13px; color: #8b90a0 !important; margin-bottom: 8px; text-decoration: none; display: block; }
+    .sub-menu-list a:hover, .sub-menu-list a.active { color: #fff !important; }
   </style>
 </head>
 <body>
@@ -99,7 +108,8 @@
       <a href="index.html?cat=diary">DIARY</a>
       <a href="index.html?cat=photos">PHOTOS</a>
     </div>
-    <div id="sub-menu"></div> </aside>
+    <div id="sub-menu"></div> 
+  </aside>
 
   <main class="content">
     <div id="post-list"></div>
@@ -109,23 +119,31 @@
 <script src="script.js"></script>
 
 <script>
-  // 메뉴 토글
   const menuBtn = document.getElementById("menuBtn");
   const sidebar = document.getElementById("sidebar");
+
   if (menuBtn && sidebar) {
-    menuBtn.onclick = () => sidebar.classList.toggle("open");
+    menuBtn.onclick = () => {
+      sidebar.classList.toggle("open");
+    };
   }
 
-  // 위로 가기 버튼
   const topBtn = document.getElementById("scrollTopBtn");
-  window.onscroll = () => {
+
+  window.onscroll = function() {
     if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
       topBtn.style.display = "flex";
     } else {
       topBtn.style.display = "none";
     }
   };
-  topBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  topBtn.onclick = function() {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
 </script>
 
 </body>
