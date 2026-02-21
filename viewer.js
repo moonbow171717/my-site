@@ -8,14 +8,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const postUrl = q.get("post");
   const img = q.get("img");
   
-  // [중요 수정] 경로가 ?로 시작하면 index.html을 붙여서 "잘못된 접근" 방지
+  // 뒤로가기 경로 보정 (잘못된 접근 방지)
   let rawPath = q.get("from") || "index.html";
   const fromPath = rawPath.startsWith("?") ? "index.html" + rawPath : rawPath;
 
   const container = document.getElementById("post");
   const sidebar = document.getElementById("sidebar");
 
-  // 뒤로가기 버튼 텍스트 정하기
+  // 뒤로가기 버튼 텍스트 설정
   let backText = "← 돌아가기";
   if (fromPath.includes("sub=")) {
     const subName = decodeURIComponent(fromPath.split("sub=")[1].split("&")[0]);
@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
     backText = "← Home으로 돌아가기";
   }
 
-  // 사진 보기 모드
+  // 사진 전용 뷰 모드
   if (img) {
     sidebar.innerHTML = `<a href="${fromPath}" class="active">${backText}</a>`;
     container.innerHTML = `
@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // 글 보기 모드
+  // 게시글 뷰 모드
   if (!postUrl) {
     container.innerHTML = "잘못된 접근입니다.";
     return;
