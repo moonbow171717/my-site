@@ -65,13 +65,12 @@ body {
   gap: 40px;
 }
 
-/* ===== 사이드바 (수정됨) ===== */
+/* ===== 사이드바 ===== */
 .sidebar {
   width: 180px;
   flex-shrink: 0;
 }
 
-/* 상위 메뉴 공통 */
 .sidebar a, .menu-toggle {
   display: block;
   text-decoration: none;
@@ -94,7 +93,6 @@ body {
   font-weight: 600;
 }
 
-/* 아코디언 서브 리스트 */
 .sub-list {
   margin-left: 15px;
   border-left: 1px solid #2a3040;
@@ -187,7 +185,7 @@ body {
 }
 
 .img-wrap img:hover {
-  transform: scale(1.02);
+  transform: scale(1.01);
 }
 
 /* ===== 이미지 확대 모달 ===== */
@@ -214,17 +212,24 @@ body {
   to { opacity: 1; }
 }
 
-/* ===== 뒤로가기 ===== */
+/* ===== 뒤로가기 버튼 개선 ===== */
 .back-btn {
   display: inline-block;
-  margin-top: 50px;
-  font-size: 13px;
+  padding: 10px 16px;
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #fff !important;
   text-decoration: none;
-  color: #7a8090;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap; /* [핵심] 줄바꿈 방지 */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: 0.2s;
 }
 
 .back-btn:hover {
-  color: #fff;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 /* ===== Pinterest Photo Grid ===== */
