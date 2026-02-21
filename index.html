@@ -10,6 +10,81 @@
       location.href = "login.html";
     }
   </script>
+  <style>
+    /* 로고 그라데이션 복구 */
+    .logo {
+      font-family: 'Pretendard', sans-serif;
+      font-weight: 800; 
+      letter-spacing: 1.5px;
+      background: linear-gradient(180deg, #FFFFFF 0%, #A0A5B5 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+      text-transform: uppercase;
+    }
+
+    /* PC 레이아웃 유지 */
+    @media (min-width: 769px) {
+      .mobile-main-menu { display: none !important; }
+      .sidebar { display: block !important; width: 180px; flex-shrink: 0; }
+    }
+
+    /* 모바일 스타일 복구 */
+    @media (max-width: 768px) {
+      .mobile-main-menu {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #2a3040;
+        padding-bottom: 15px;
+      }
+      .mobile-main-menu a {
+        text-transform: uppercase;
+        font-weight: 600;
+        text-align: center;
+        color: #fff !important;
+        text-decoration: none;
+        font-size: 13px;
+        background: #232833;
+        padding: 12px 5px;
+        border-radius: 12px;
+      }
+      .sidebar.open {
+        display: block !important;
+        background: #171a21;
+        padding: 20px;
+        border-radius: 20px;
+        border: 1px solid #2a3040;
+      }
+    }
+
+    /* 위로 가기 버튼 디자인 */
+    #scrollTopBtn {
+      position: fixed; bottom: 30px; right: 25px; z-index: 1000;
+      width: 45px; height: 45px; background-color: rgba(255, 255, 255, 0.1);
+      color: white; border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50%; cursor: pointer; font-size: 20px;
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      display: none; align-items: center; justify-content: center;
+      transition: background 0.3s;
+    }
+
+    /* 아코디언 서브메뉴 스타일 추가 */
+    .menu-group { margin-bottom: 8px; }
+    .menu-parent { 
+      font-weight: bold; color: #fff; display: block; 
+      margin-bottom: 5px; cursor: pointer; padding: 5px 0;
+    }
+    .sub-menu-list { 
+      display: none; padding-left: 15px; 
+    }
+    .sub-menu-list.active { display: block; }
+    .sub-menu-list a { 
+      font-size: 0.95em; display: block; margin-bottom: 6px; color: #aaa !important; 
+    }
+    .sub-menu-list a.active { color: #fff !important; font-weight: 600; }
+  </style>
 </head>
 <body>
 
@@ -29,6 +104,11 @@
 
 <div class="layout">
   <aside class="sidebar" id="sidebar">
+    <div class="mobile-main-menu">
+      <a href="index.html">HOME</a>
+      <a href="index.html?cat=diary">DIARY</a>
+      <a href="index.html?cat=photos">PHOTOS</a>
+    </div>
     <div id="sub-menu"></div>
   </aside>
 
@@ -38,5 +118,28 @@
 </div>
 
 <script src="script.js"></script>
+
+<script>
+  // 메뉴 토글 기능
+  const menuBtn = document.getElementById("menuBtn");
+  const sidebar = document.getElementById("sidebar");
+  if (menuBtn && sidebar) {
+    menuBtn.onclick = () => { sidebar.classList.toggle("open"); };
+  }
+
+  // 스크롤 상단 이동 기능
+  const topBtn = document.getElementById("scrollTopBtn");
+  window.onscroll = function() {
+    if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+      topBtn.style.display = "flex";
+    } else {
+      topBtn.style.display = "none";
+    }
+  };
+  topBtn.onclick = function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+</script>
+
 </body>
 </html>
