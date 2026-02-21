@@ -65,7 +65,7 @@ body {
   gap: 40px;
 }
 
-/* ===== 사이드바 (PC) ===== */
+/* ===== 사이드바 ===== */
 .sidebar {
   width: 180px;
   flex-shrink: 0;
@@ -80,13 +80,22 @@ body {
   transition: 0.2s;
 }
 
+.sidebar a:hover {
+  color: #fff;
+}
+
 .sidebar a.active {
   color: #fff;
   font-weight: 500;
 }
 
-/* ===== 콘텐츠 & 카드 ===== */
-.content { flex: 1; min-width: 0; }
+/* ===== 콘텐츠 ===== */
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ===== 카드 ===== */
 .post-item {
   padding: 20px;
   border-radius: 12px;
@@ -96,20 +105,162 @@ body {
   cursor: pointer;
   transition: 0.25s;
 }
+
 .post-item:hover {
   transform: translateY(-2px);
   background: #1c2028;
   border-color: #2a3040;
 }
-.post-item h3 { margin: 0 0 6px; font-size: 18px; font-weight: 500; }
-.post-item .date { font-size: 12px; color: #8b90a0; }
-.post-item p { margin-top: 8px; font-size: 14px; color: #b5bac7; }
 
-/* ===== 반응형 (모바일) ===== */
+.post-item h3 {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.post-item .date {
+  font-size: 12px;
+  color: #8b90a0;
+}
+
+.post-item p {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #b5bac7;
+}
+
+/* ===== 글 보기 ===== */
+.post-view {
+  max-width: 720px;
+  margin: auto;
+}
+
+.post-title {
+  font-size: 26px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.meta {
+  font-size: 12px;
+  color: #8b90a0;
+}
+
+.post-content {
+  margin-top: 30px;
+  line-height: 1.9;
+  color: #d6d9e0;
+  font-size: 15.5px;
+}
+
+/* ===== 이미지 ===== */
+.img-wrap {
+  margin: 34px 0;
+  text-align: center;
+}
+
+.img-wrap img {
+  max-width: 100%;
+  border-radius: 14px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  cursor: zoom-in;
+  transition: 0.25s;
+}
+
+.img-wrap img:hover {
+  transform: scale(1.02);
+}
+
+/* ===== 이미지 확대 모달 ===== */
+.img-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  animation: fadeIn 0.2s ease;
+}
+
+.img-modal img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ===== 뒤로가기 ===== */
+.back-btn {
+  display: inline-block;
+  margin-top: 50px;
+  font-size: 13px;
+  text-decoration: none;
+  color: #7a8090;
+}
+
+.back-btn:hover {
+  color: #fff;
+}
+
+/* ===== Pinterest Photo Grid ===== */
+.photo-grid {
+  column-count: 4;
+  column-gap: 16px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.photo-card {
+  break-inside: avoid;
+  margin-bottom: 16px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+}
+
+.photo-card img {
+  width: 100%;
+  display: block;
+  border-radius: 14px;
+  transition: 0.3s;
+}
+
+.photo-card:hover img {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
+/* ===== 반응형 (모바일 최적화 수정완료) ===== */
+
+@media (max-width: 1200px) {
+  .photo-grid { column-count: 3; }
+}
+
+@media (max-width: 800px) {
+  .photo-grid { column-count: 2; }
+}
+
 @media (max-width: 768px) {
-  .layout { flex-direction: column; gap: 10px; margin: 20px auto; }
-  .sidebar { display: none; width: 100%; box-sizing: border-box; }
+  .layout {
+    flex-direction: column;
+    gap: 10px;
+    margin: 20px auto;
+  }
 
+  .sidebar {
+    display: none;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* 🎨 모바일 메뉴 상자 디자인 */
   .sidebar.open {
     display: block !important;
     background: #171a21;
@@ -121,7 +272,7 @@ body {
     animation: slideDown 0.3s ease-out;
   }
 
-  /* 메인 버튼 3개 (아이콘 없이 깔끔하게) */
+  /* 메인 버튼 가로 3칸 배치 */
   .mobile-main-menu {
     display: grid !important;
     grid-template-columns: repeat(3, 1fr);
@@ -133,21 +284,23 @@ body {
 
   .mobile-main-menu a {
     background: #232833 !important;
-    padding: 14px 5px !important;
+    padding: 12px 5px !important;
     border-radius: 12px !important;
     font-size: 13px !important;
     text-align: center;
     border: none !important;
+    margin-bottom: 0 !important;
     color: #fff !important;
     font-weight: 600;
   }
 
-  /* 하위 메뉴 리스트 */
+  /* 하위 카테고리(일상 등) 스타일 */
   #sub-menu a {
     padding: 12px 15px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     background: rgba(255,255,255,0.03);
     border-radius: 10px;
+    border: none;
     color: #a0a5b5;
     font-size: 14px;
     display: block;
@@ -156,18 +309,23 @@ body {
   #sub-menu a.active {
     background: #313846;
     color: #fff;
+    font-weight: 600;
   }
 
-  .menu-btn { display: block !important; }
-  .top-links { display: none !important; }
+  .menu-btn {
+    display: block !important;
+  }
+
+  .top-links {
+    display: none !important;
+  }
+}
+
+@media (max-width: 500px) {
+  .photo-grid { column-count: 1; }
 }
 
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
-/* (기타 Pinterest 그리드 등 기존 스타일 유지...) */
-.photo-grid { column-count: 4; column-gap: 16px; }
-.photo-card { break-inside: avoid; margin-bottom: 16px; border-radius: 14px; overflow: hidden; }
-.photo-card img { width: 100%; display: block; transition: 0.3s; }
