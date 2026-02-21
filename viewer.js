@@ -37,14 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div style="margin-top:20px;"><a class="back-btn" href="${fromPath}">${backText}</a></div>
       </div>
       <div id="imgModal" class="img-modal"><img id="modalImg"></div>`;
-    
-    const modal = document.getElementById("imgModal");
-    const modalImg = document.getElementById("modalImg");
-    document.querySelector(".zoomable").onclick = e => {
-      modal.style.display = "flex";
-      modalImg.src = e.target.src;
-    };
-    modal.onclick = () => modal.style.display = "none";
+    // ... 이미지 관련 생략 ...
     return;
   }
 
@@ -77,8 +70,12 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch("posts/index.json?v=" + Date.now())
           .then(res => res.json())
           .then(allPosts => {
+            // 현재 글의 sub 값을 가져와서 앞뒤 공백 제거
+            const currentSub = (p.sub || "").trim();
+
+            // 같은 sub를 가진 글들만 필터링 (날짜순)
             const seriesPosts = allPosts
-              .filter(item => item.sub === p.sub)
+              .filter(item => item.sub && item.sub.trim() === currentSub)
               .sort((a, b) => new Date(a.date) - new Date(b.date));
 
             const currentIndex = seriesPosts.findIndex(item => {
@@ -88,15 +85,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const navContainer = document.getElementById("series-nav");
             if (currentIndex !== -1 && seriesPosts.length > 1) {
-              // 💡 버튼 텍스트 자동 결정 (NR, 일상, 잡담 등은 '글' / 그 외 시리즈는 '화')
-              const subName = p.sub || "";
-              const isShortStory = subName.includes("NR") || subName.includes("일상") || subName.includes("잡담") || subName.includes("카페");
-              const unit = isShortStory ? "글" : "화";
+              // 💡 '글'로 표시할 단편 메뉴 리스트 (여기에 없는 건 전부 '화'로 나옵니다)
+              const shortMenus = ["NR", "일상", "잡담", "카페", "끄적끄적"];
+              const isShort = shortMenus.some(m => currentSub.includes(m));
+              const unit = isShort ? "글" : "화";
               
               let navHtml = "";
               if (currentIndex > 0) {
                 const prev = seriesPosts[currentIndex - 1];
-                const prevUrl = `viewer.html?post=posts/${prev.file || prev.date}.json&from=${encodeURIComponent(q.get("from"))}`;
+                const prevUrl = `viewer.html?post=posts/${prev.file || prev.date}.json&from=${encodeURIComponent(q.get("from") || "index.html")}`;
                 navHtml += `<a href="${prevUrl}" class="back-btn" style="flex:1; text-align:center;">← 이전 ${unit}</a>`;
               } else {
                 navHtml += `<div style="flex:1;"></div>`;
@@ -104,12 +101,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
               if (currentIndex < seriesPosts.length - 1) {
                 const next = seriesPosts[currentIndex + 1];
-                const nextUrl = `viewer.html?post=posts/${next.file || next.date}.json&from=${encodeURIComponent(q.get("from"))}`;
+                const nextUrl = `viewer.html?post=posts/${next.file || next.date}.json&from=${encodeURIComponent(q.get("from") || "index.html")}`;
                 navHtml += `<a href="${nextUrl}" class="back-btn" style="flex:1; text-align:center;">다음 ${unit} →</a>`;
               } else {
                 navHtml += `<div style="flex:1;"></div>`;
               }
-              
               navContainer.innerHTML = navHtml;
             }
           });
@@ -121,6 +117,5 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         modal.onclick = () => { modal.style.display = "none"; };
       });
-    })
-    .catch(() => { container.innerHTML = "글을 불러오지 못했습니다."; });
+    });
 });
