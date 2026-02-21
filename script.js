@@ -37,11 +37,9 @@ document.addEventListener("DOMContentLoaded", () => {
   fetch("posts/index.json?v=" + new Date().getTime())
     .then(r => r.json())
     .then(originalPosts => {
-      // 데이터가 비어있지 않은지 확인
       const validPosts = originalPosts.filter(p => p && p.title && p.date);
       let posts = [...validPosts];
 
-      // 사이드바 메뉴 그리기 (Diary 모드일 때)
       if (category === "diary") {
         const menuStructure = [
           { name: "글", subs: ["일상", "카페"] },
@@ -55,11 +53,11 @@ document.addEventListener("DOMContentLoaded", () => {
         menuStructure.forEach(m => {
           const isParentActive = (parentParam === m.name && !subParam);
           menuHtml += `<div style="margin-top:10px;">
-            <a href="index.html?cat=diary&parent=${encodeURIComponent(m.name)}"${isParentActive ? ' class="active"' : ''} style="font-weight:bold; color:#aaa;"># ${m.name}</a>`;
+            <a href="index.html?cat=diary&parent=${encodeURIComponent(m.name)}"${isParentActive ? ' class="active"' : ''} style="font-weight:bold; color:#aaa; display:block; margin-bottom:5px;"># ${m.name}</a>`;
           
           m.subs.forEach(s => {
             const isSubActive = (subParam === s);
-            menuHtml += `<a href="index.html?cat=diary&parent=${encodeURIComponent(m.name)}&sub=${encodeURIComponent(s)}"${isSubActive ? ' class="active"' : ''} style="padding-left:15px; font-size:0.9em;">ㄴ ${s}</a>`;
+            menuHtml += `<a href="index.html?cat=diary&parent=${encodeURIComponent(m.name)}&sub=${encodeURIComponent(s)}"${isSubActive ? ' class="active"' : ''} style="padding-left:15px; font-size:0.9em; display:block; margin-bottom:3px;">ㄴ ${s}</a>`;
           });
           menuHtml += `</div>`;
         });
@@ -68,23 +66,19 @@ document.addEventListener("DOMContentLoaded", () => {
         subMenu.innerHTML = `<a href="index.html" class="active">최신글 목록</a>`;
       }
 
-      // 🔍 핵심 필터링 로직 수정
-      // 1. 카테고리 필터 (diary, photos 등)
+      // 🔍 필터링 로직 (상위 메뉴 클릭 시 하위 항목 포함하도록 수정)
       if (category) {
         posts = posts.filter(p => p.category === category);
       }
       
-      // 2. 상위 메뉴 필터 (글, 냐람 등) - sub가 선택되지 않았을 때만 작동
-      if (parentParam && !subParam) {
+      if (subParam) {
+        // 하위 메뉴(ㄴ 연애 포기 각서)를 누르면 해당 글만 보여줌
+        posts = posts.filter(p => p.sub === subParam);
+      } else if (parentParam) {
+        // 상위 메뉴(# 냐람)를 누르면 해당 parent에 속한 모든 글을 보여줌
         posts = posts.filter(p => p.parent === parentParam);
       }
-      
-      // 3. 하위 메뉴 필터 (일상, 연애 포기 각서 등)
-      if (subParam) {
-        posts = posts.filter(p => p.sub === subParam);
-      }
 
-      // 결과가 없을 때 처리
       if (posts.length === 0) {
         list.innerHTML = `<div style="padding:20px; color:#666;">해당 카테고리에 등록된 글이 없습니다.</div>`;
         return;
@@ -102,8 +96,8 @@ document.addEventListener("DOMContentLoaded", () => {
           let fromPath = "index.html";
           if (category === "diary") {
             fromPath += `?cat=diary`;
-            if (p.parent) fromPath += `&parent=${encodeURIComponent(p.parent)}`;
-            if (p.sub) fromPath += `&sub=${encodeURIComponent(p.sub)}`;
+            if (parentParam) fromPath += `&parent=${encodeURIComponent(parentParam)}`;
+            if (subParam) fromPath += `&sub=${encodeURIComponent(subParam)}`;
           } else if (category === "photos") {
             fromPath += `?cat=photos`;
           }
