@@ -11,7 +11,6 @@
     }
   </script>
   <style>
-    /* 로고 스타일 */
     .logo {
       font-family: 'Pretendard', sans-serif;
       font-weight: 800; 
@@ -22,23 +21,17 @@
       display: inline-block;
       text-transform: uppercase;
     }
-
-    /* 줄바꿈 버그 수정 */
     #post {
       word-break: break-all;
       overflow-wrap: break-word;
       line-height: 1.8;
       color: #d1d5db;
     }
-
-    /* 이미지 모서리 둥글게 */
     .img-wrap img {
       width: 100%;
       border-radius: 20px;
       margin: 15px 0;
     }
-
-    /* [추가] 위로 가기 버튼 디자인 */
     #scrollTopBtn {
       position: fixed;
       bottom: 30px;
@@ -54,16 +47,14 @@
       font-size: 20px;
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
-      display: none; /* 스크립트에서 제어함 */
+      display: none;
       align-items: center;
       justify-content: center;
       transition: background 0.3s;
     }
   </style>
 </head>
-
 <body>
-
 <nav class="topbar">
   <div class="top-inner">
     <div class="logo">MY ARCHIVE</div>
@@ -75,48 +66,32 @@
     <button class="menu-btn" id="menuBtn">☰</button>
   </div>
 </nav>
-
 <button id="scrollTopBtn" title="Go to top">↑</button>
-
 <div class="layout">
   <aside class="sidebar" id="sidebar"></aside>
-
   <main class="content">
-    <div id="post">
-      </div>
+    <div id="post"></div>
   </main>
 </div>
-
-<script src="viewer.js?v=4"></script>
-
+<script src="viewer.js?v=5"></script>
 <script>
-  // 메뉴 토글 기능
   const menuBtn = document.getElementById("menuBtn");
   if(menuBtn) {
     menuBtn.onclick = () => {
       document.getElementById("sidebar").classList.toggle("open");
     };
   }
-
-  // [추가] 위로 가기 버튼 기능
   const topBtn = document.getElementById("scrollTopBtn");
-
   window.onscroll = function() {
-    // 300px 이상 내리면 버튼 보이고, 아니면 숨김
     if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
       topBtn.style.display = "flex";
     } else {
       topBtn.style.display = "none";
     }
   };
-
   topBtn.onclick = function() {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 </script>
-
 </body>
 </html>
