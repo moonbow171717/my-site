@@ -50,6 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
           { name: "냐쥬", subs: ["대타위기사랑", "순애보증수표", "NJ"] },
 		  { name: "댠닺", subs: ["Private", "DD"] },
 		  { name: "쥬얀", subs: ["시시콜콜한 마음", "양의 종말", "JA"]},
+		  { name: "원작", subs: ["Denied Love"]},
           { name: "끄적끄적", subs: ["잡담"] }
         ];
 
