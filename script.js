@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (category === "diary") {
         const menuStructure = [
           { name: "글", subs: ["성간운", "일상", "카페"] },
-          { name: "냐람", subs: ["구원의 구원", "러브 콤플렉스", "연애 포기 각서", "지구 열 바퀴", "홈 스윗 홈", "NR"] },
+          { name: "냐람", subs: ["구원의 구원", "돌을 던진 것은 누구인가", "러브 콤플렉스", "연애 포기 각서", "지구 열 바퀴", "홈 스윗 홈", "NR"] },
           { name: "냐쥬", subs: ["대타위기사랑", "순애보증수표", "NJ"] },
 		  { name: "댠닺", subs: ["Private", "DD"] },
 		  { name: "쥬얀", subs: ["시시콜콜한 마음", "양의 종말", "JA"]},
