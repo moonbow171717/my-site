@@ -94,7 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (currentIndex !== -1 && seriesPosts.length > 1) {
               
               // 💡 '글'로 표시할 단어 리스트
-              const postUnits = ["일상", "카페", "nr", "nj", "ja", "잡담", "기록"]; 
+              const postUnits = ["일상", "카페", "dd", "nr", "nj", "ja", "잡담", "기록"]; 
               
               // 현재 주소창 메뉴 이름에 위 단어가 들어있으면 '글', 아니면 '화'
               const isPostUnit = postUnits.some(u => currentSubFromUrl.includes(u));
